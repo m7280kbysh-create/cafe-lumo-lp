@@ -1,146 +1,332 @@
+// client/src/pages/Hub.tsx
 import { Link } from "wouter";
-import type { SVGProps } from "react";
+import { motion } from "framer-motion";
+import type { ReactNode } from "react";
+
+const reveal = {
+  initial: { opacity: 0, y: 22 },
+  whileInView: { opacity: 1, y: 0 },
+  transition: { duration: 0.7, ease: "easeOut" as const },
+  viewport: { once: true, amount: 0.2 },
+};
 
 export default function Hub() {
   return (
-    <div className="bg-background text-foreground min-h-screen font-sans">
-      <main className="container mx-auto px-4 py-8 md:py-16">
-        <section className="text-center mb-16 md:mb-24">
-          <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
-            あなたのビジネスに、
-            <br />
-            最適なLPを。
-          </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-            小規模事業者様向けに、予約・問い合わせ導線を「1ページ」に整理したLPを制作します。
-            集客〜予約までの迷いを減らし、来店につなげます。
-          </p>
-        </section>
+    <div className="bg-background text-foreground min-h-screen">
+      {/* HERO */}
+      <header className="relative overflow-hidden">
+        <div className="absolute inset-0">
+          <img
+            src="/demo/hub/hero.png"
+            alt="上質で落ち着いた空間（架空デモ）"
+            className="h-full w-full object-cover"
+            loading="eager"
+          />
+          {/* ベール（読みやすさ＋高級感） */}
+          <div className="absolute inset-0 bg-black/45" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/25 to-background" />
+        </div>
 
-        <section className="mb-16 md:mb-24">
-          <h2 className="text-3xl font-bold text-center mb-8">提供内容（概要）</h2>
-          <div className="max-w-2xl mx-auto bg-card p-8 rounded-lg border border-border shadow-md">
-            <h3 className="text-2xl font-semibold text-card-foreground mb-4">
-              初月トライアル（買い切り）
-            </h3>
-            <p className="text-4xl font-bold mb-2">
-              5,000円
-              <span className="text-lg font-normal text-muted-foreground">（税別）〜</span>
-            </p>
-            <p className="text-muted-foreground mb-6">
-              素材が揃っていれば最短2〜3日で公開可能です（内容により変動）。
+        <div className="relative container mx-auto px-6 py-16 md:py-24">
+          <div className="max-w-3xl">
+            <p className="text-white/80 text-sm tracking-wide">
+              店舗向けLP制作（ポートフォリオ）
             </p>
 
-            <ul className="space-y-3 text-card-foreground text-sm">
-              <li className="flex items-center">
-                <CheckIcon className="w-5 h-5 text-primary mr-3" />
-                <span>スマホ対応（1ページLP）</span>
-              </li>
-              <li className="flex items-center">
-                <CheckIcon className="w-5 h-5 text-primary mr-3" />
-                <span>予約/問い合わせ導線（LINE・電話・予約サイト等）を1つに整理</span>
-              </li>
-              <li className="flex items-center">
-                <CheckIcon className="w-5 h-5 text-primary mr-3" />
-                <span>テキスト/画像差し替え（修正1回まで）</span>
-              </li>
-              <li className="flex items-center">
-                <CheckIcon className="w-5 h-5 text-primary mr-3" />
-                <span>公開（Vercel等）まで対応（独自ドメインはオプション）</span>
-              </li>
-            </ul>
-          </div>
-        </section>
+            <h1 className="mt-4 text-4xl md:text-6xl font-extrabold leading-tight tracking-tight text-white">
+              静かに整う導線で、
+              <br />
+              来店につなげる。
+            </h1>
 
-        <section className="text-center mb-16 md:mb-24">
-          <h2 className="text-3xl font-bold mb-8">業種別デモサイト（架空）</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            <DemoCard
-              href="/food"
-              title="飲食店"
-              description="メニュー・アクセス・予約導線を整理"
-              gradient="from-orange-400 to-rose-400"
-            />
-            <DemoCard
-              href="/beauty"
-              title="美容サロン"
-              description="メニュー/料金・予約導線を整理"
-              gradient="from-purple-400 to-pink-400"
-            />
-            <DemoCard
-              href="/clinic"
-              title="整体・治療院"
-              description="初回導線・注意事項・予約導線を整理"
-              gradient="from-teal-400 to-cyan-400"
-            />
-          </div>
-          <p className="mt-6 text-xs text-muted-foreground">
-            ※本サイトは架空の店舗・サービスを用いたデモ（ポートフォリオ）です。
-          </p>
-        </section>
+            <p className="mt-6 text-white/80 text-lg md:text-xl leading-relaxed">
+              Instagramのリンク1つから、メニュー・アクセス・予約/問い合わせを
+              <br />
+              1ページにまとめます。迷いを減らして、次のアクションへ。
+            </p>
 
-        <section className="text-center bg-card border border-border rounded-lg p-8 max-w-2xl mx-auto">
-          <h2 className="text-2xl font-bold mb-4">お問い合わせ</h2>
-          <p className="text-muted-foreground mb-6">ご相談・お見積もりは無料です（サンプル）。</p>
-          <div className="flex justify-center items-center space-x-6">
-            <a href="mailto:your-email@example.com" className="text-primary hover:underline">
-              Email
-            </a>
-            <a
-              href="https://instagram.com/your_account"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:underline"
-            >
-              Instagram
-            </a>
+            <div className="mt-10 flex flex-col sm:flex-row gap-3">
+              <a
+                href="#demos"
+                className="inline-flex items-center justify-center rounded-full bg-white text-black px-7 py-3 text-sm font-semibold hover:bg-white/90 transition"
+              >
+                デモを見る
+              </a>
+              <a
+                href="#contact"
+                className="inline-flex items-center justify-center rounded-full border border-white/35 bg-white/10 text-white px-7 py-3 text-sm font-semibold hover:bg-white/15 transition"
+              >
+                相談する（無料）
+              </a>
+            </div>
+
+            <p className="mt-6 text-xs text-white/70">
+              ※本サイトは架空のデモ（ポートフォリオ）です。実在の店舗・人物・団体とは関係ありません。
+            </p>
           </div>
-        </section>
+        </div>
+      </header>
+
+      <main>
+        {/* OFFER */}
+        <MotionSection className="py-16 md:py-24">
+          <div className="mx-auto max-w-5xl">
+            <div className="grid gap-10 md:grid-cols-2 md:items-start">
+              <div>
+                <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
+                  提供内容（概要）
+                </h2>
+                <p className="mt-4 text-muted-foreground leading-relaxed">
+                  伝えることを増やすのではなく、迷いを減らします。
+                  <br />
+                  “予約/問い合わせまでの道筋”を整えるLPです。
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-border bg-card p-6">
+                <div className="flex items-baseline gap-2">
+                  <div className="text-3xl font-bold">初月 5,000円〜</div>
+                  <div className="text-sm text-muted-foreground">（買い切り・範囲固定）</div>
+                </div>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  素材が揃っていれば最短2〜3日で公開可能（内容により変動）
+                </p>
+
+                <ul className="mt-5 space-y-2 text-sm">
+                  <li className="flex gap-2">
+                    <span className="mt-1 h-1.5 w-1.5 rounded-full bg-foreground/60" />
+                    <span>スマホ最適化の1ページLP</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="mt-1 h-1.5 w-1.5 rounded-full bg-foreground/60" />
+                    <span>予約/問い合わせ導線（LINE・電話・予約サイト等）を整理</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="mt-1 h-1.5 w-1.5 rounded-full bg-foreground/60" />
+                    <span>テキスト/画像差し替え（修正1回まで）</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="mt-1 h-1.5 w-1.5 rounded-full bg-foreground/60" />
+                    <span>公開まで対応（独自ドメインはオプション）</span>
+                  </li>
+                </ul>
+
+                <p className="mt-4 text-xs text-muted-foreground">
+                  ※実案件では、制作範囲・修正回数・納期を事前に合意して進行します。
+                </p>
+              </div>
+            </div>
+          </div>
+        </MotionSection>
+
+        {/* PROCESS */}
+        <MotionSection className="py-16 md:py-24 bg-card border-y border-border">
+          <div className="mx-auto max-w-5xl">
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-center">
+              制作の流れ
+            </h2>
+
+            <div className="mt-10 grid gap-6 md:grid-cols-4">
+              <StepCard num="01" title="ヒアリング" desc="目的と導線（LINE/電話/予約サイト等）を確認" />
+              <StepCard num="02" title="初稿制作" desc="テンプレをベースに、最短で形にします" />
+              <StepCard num="03" title="確認・修正" desc="必要な箇所だけ修正（回数はプランにより）" />
+              <StepCard num="04" title="公開" desc="公開後に導線チェック。運用のコツも共有" />
+            </div>
+          </div>
+        </MotionSection>
+
+        {/* DEMOS */}
+        <MotionSection id="demos" className="py-16 md:py-24">
+          <div className="mx-auto max-w-6xl">
+            <div className="text-center">
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
+                業種別デモ（架空）
+              </h2>
+              <p className="mt-4 text-muted-foreground">
+                1クリックで“完成イメージ”が見えるようにしています。
+              </p>
+            </div>
+
+            <div className="mt-10 grid gap-6 md:grid-cols-3">
+              <DemoCard
+                href="/food"
+                title="飲食店"
+                subtitle="メニュー・アクセス・来店導線"
+                img="/demo/hub/food.png"
+              />
+              <DemoCard
+                href="/beauty"
+                title="美容サロン"
+                subtitle="上質感・予約導線・安心材料"
+                img="/demo/hub/beauty.png"
+              />
+              <DemoCard
+                href="/clinic"
+                title="整体・施術"
+                subtitle="初回導線・不安解消・予約導線"
+                img="/demo/hub/clinic.png"
+              />
+            </div>
+
+            <p className="mt-6 text-center text-xs text-muted-foreground">
+              ※各ページは架空店舗のデモ（ポートフォリオ）です。実在のレビューや実在店舗を装いません。
+            </p>
+          </div>
+        </MotionSection>
+
+        {/* FAQ */}
+        <MotionSection className="py-16 md:py-24 bg-card border-y border-border">
+          <div className="mx-auto max-w-4xl">
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-center">
+              よくあるご質問
+            </h2>
+
+            <div className="mt-10 space-y-4">
+              <FaqItem
+                q="素材は何が必要ですか？"
+                a="店名、営業時間、メニュー/料金、写真、予約/問い合わせ導線（LINE等）があれば制作できます。"
+              />
+              <FaqItem
+                q="修正は何回まで？"
+                a="初月トライアルは基本1回までを目安に、範囲を固定してスピード優先で進めます。"
+              />
+              <FaqItem
+                q="独自ドメインは必要ですか？"
+                a="ポートフォリオ/試用段階は不要です。本番運用する場合は店舗様名義で取得→接続が安全です。"
+              />
+              <FaqItem
+                q="予約フォームや予約システム連携はできますか？"
+                a="可能です（内容によりオプション）。まずはLINE/電話/既存予約URLに集約する形が早いです。"
+              />
+              <FaqItem
+                q="公開後の運用は？"
+                a="更新頻度が少ないLPは“必要なときに直せる”設計が重要。運用方法も合わせて共有します。"
+              />
+            </div>
+          </div>
+        </MotionSection>
+
+        {/* CONTACT */}
+        <MotionSection id="contact" className="py-16 md:py-24">
+          <div className="mx-auto max-w-4xl rounded-2xl border border-border bg-card p-8 md:p-10">
+            <div className="grid gap-8 md:grid-cols-2 md:items-center">
+              <div>
+                <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
+                  まずは相談だけでも
+                </h2>
+                <p className="mt-3 text-muted-foreground">
+                  「いまの導線だと、何がもったいないか」から一緒に整理します。
+                  <br />
+                  相談・見積もりは無料（サンプル）です。
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                <a
+                  href="mailto:your-email@example.com"
+                  className="inline-flex items-center justify-center rounded-full bg-foreground text-background px-6 py-3 text-sm font-semibold hover:opacity-90 transition"
+                >
+                  メールで相談する
+                </a>
+                <a
+                  href="https://instagram.com/your_account"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center justify-center rounded-full border border-border bg-background px-6 py-3 text-sm font-semibold hover:bg-muted transition"
+                >
+                  Instagramへ
+                </a>
+                <p className="text-xs text-muted-foreground">
+                  ※リンク先はあなたの連絡先に差し替えてください
+                </p>
+              </div>
+            </div>
+          </div>
+        </MotionSection>
       </main>
 
-      <footer className="text-center py-6">
-        <p className="text-xs text-muted-foreground">
-          【注意】本サイトは架空の店舗・サービスを用いたデモ（ポートフォリオ）です。
-        </p>
+      <footer className="py-10 text-center text-xs text-muted-foreground">
+        【注意】本サイトは架空の店舗・サービスを用いたデモ（ポートフォリオ）です。
       </footer>
     </div>
   );
 }
 
-const CheckIcon = (props: SVGProps<SVGSVGElement>) => (
-  <svg
-    {...props}
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <polyline points="20 6 9 17 4 12" />
-  </svg>
-);
+/* components */
+
+function MotionSection({
+  children,
+  className = "",
+  id,
+}: {
+  children: ReactNode;
+  className?: string;
+  id?: string;
+}) {
+  return (
+    <motion.section
+      id={id}
+      className={`container mx-auto px-6 ${className}`}
+      initial={reveal.initial}
+      whileInView={reveal.whileInView}
+      transition={reveal.transition}
+      viewport={reveal.viewport}
+    >
+      {children}
+    </motion.section>
+  );
+}
+
+function StepCard({ num, title, desc }: { num: string; title: string; desc: string }) {
+  return (
+    <div className="rounded-2xl border border-border bg-background p-6">
+      <div className="text-xs text-muted-foreground tracking-wider">{num}</div>
+      <div className="mt-2 text-lg font-semibold">{title}</div>
+      <div className="mt-2 text-sm text-muted-foreground leading-relaxed">{desc}</div>
+    </div>
+  );
+}
 
 function DemoCard({
   href,
   title,
-  description,
-  gradient,
+  subtitle,
+  img,
 }: {
   href: string;
   title: string;
-  description: string;
-  gradient: string;
+  subtitle: string;
+  img: string;
 }) {
   return (
     <Link href={href}>
-      <a
-        className={`block p-8 rounded-lg bg-gradient-to-br ${gradient} text-white shadow-lg transform hover:scale-105 transition-transform duration-300`}
-      >
-        <h3 className="text-2xl font-bold mb-2">{title}</h3>
-        <p className="font-light">{description}</p>
+      <a className="group relative overflow-hidden rounded-2xl border border-border bg-card min-h-[260px] focus:outline-none focus:ring-2 focus:ring-foreground/30">
+        <img src={img} alt={`${title}のイメージ（架空）`} className="absolute inset-0 h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-black/40 group-hover:bg-black/35 transition-colors" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/10 to-black/55" />
+
+        <div className="relative p-6 h-full flex flex-col justify-end">
+          <div className="text-white/80 text-xs tracking-wide">DEMO</div>
+          <div className="mt-1 text-2xl font-bold text-white">{title}</div>
+          <div className="mt-1 text-white/80 text-sm">{subtitle}</div>
+          <div className="mt-4 inline-flex items-center gap-2 text-white text-sm font-semibold">
+            デモを見る
+            <span className="translate-x-0 group-hover:translate-x-1 transition-transform">→</span>
+          </div>
+        </div>
       </a>
     </Link>
+  );
+}
+
+function FaqItem({ q, a }: { q: string; a: string }) {
+  return (
+    <details className="rounded-xl border border-border bg-background p-5">
+      <summary className="cursor-pointer font-semibold list-none flex items-center justify-between">
+        <span>{q}</span>
+        <span className="text-muted-foreground">＋</span>
+      </summary>
+      <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{a}</p>
+    </details>
   );
 }
