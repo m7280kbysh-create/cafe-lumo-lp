@@ -287,37 +287,62 @@ function StepCard({ num, title, desc }: { num: string; title: string; desc: stri
   );
 }
 
-function DemoCard({
-  href,
-  title,
-  subtitle,
-  img,
-}: {
-  href: string;
-  title: string;
-  subtitle: string;
-  img: string;
+function DemoCard({ href, title, subtitle, img }: {
+  href: string; title: string; subtitle: string; img: string;
 }) {
   return (
-    <Link href={href}>
-      <a className="group relative overflow-hidden rounded-2xl border border-border bg-card min-h-[260px] focus:outline-none focus:ring-2 focus:ring-foreground/30">
-        <img src={img} alt={`${title}のイメージ（架空）`} className="absolute inset-0 h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-black/40 group-hover:bg-black/35 transition-colors" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/10 to-black/55" />
+    <Link
+      href={href}
+      className="group relative isolate block overflow-hidden rounded-2xl
+                 border border-border/80 bg-zinc-950 min-h-[280px]
+                 shadow-sm hover:shadow-lg hover:shadow-black/20
+                 transition-shadow
+                 focus:outline-none focus:ring-2 focus:ring-foreground/30"
+    >
+      {/* 画像 */}
+      <img
+        src={img}
+        alt={`${title}のイメージ（架空）`}
+        loading="lazy"
+        decoding="async"
+        className="absolute inset-0 z-0 h-full w-full object-cover
+                   contrast-125 saturate-125 brightness-90
+                   scale-[1.03] transition-transform duration-500
+                   group-hover:scale-[1.06]"
+      />
 
-        <div className="relative p-6 h-full flex flex-col justify-end">
-          <div className="text-white/80 text-xs tracking-wide">DEMO</div>
-          <div className="mt-1 text-2xl font-bold text-white">{title}</div>
-          <div className="mt-1 text-white/80 text-sm">{subtitle}</div>
-          <div className="mt-4 inline-flex items-center gap-2 text-white text-sm font-semibold">
-            デモを見る
-            <span className="translate-x-0 group-hover:translate-x-1 transition-transform">→</span>
-          </div>
+      {/* ベースの締め（少し緩め） */}
+      <div className="absolute inset-0 z-10 bg-gradient-to-br from-zinc-950/60 via-zinc-950/25 to-black/60" />
+
+      {/* 可読性：黒ベール（少し緩め） */}
+      <div className="absolute inset-0 z-20 bg-black/30 group-hover:bg-black/24 transition-colors" />
+
+      {/* 下側を締めて文字を守る */}
+      <div className="absolute inset-0 z-20 bg-gradient-to-b from-black/20 via-transparent to-black/70" />
+
+      {/* 艶（上品なハイライト） */}
+      <div className="pointer-events-none absolute inset-0 z-20 opacity-0 group-hover:opacity-100 transition-opacity
+                      bg-[radial-gradient(800px_circle_at_20%_0%,rgba(255,255,255,0.10),transparent_40%)]" />
+
+      {/* コンテンツ */}
+      <div className="relative z-30 p-6 h-full flex flex-col justify-end">
+        <div className="text-white/70 text-xs tracking-[0.22em]">DEMO</div>
+        <div className="mt-2 text-2xl font-bold text-white drop-shadow-md">{title}</div>
+        <div className="mt-1 text-white/80 text-sm drop-shadow-sm">{subtitle}</div>
+
+        <div className="mt-5 inline-flex items-center gap-2 text-white text-sm font-semibold drop-shadow-sm">
+          デモを見る
+          <span className="translate-x-0 group-hover:translate-x-1 transition-transform">→</span>
         </div>
-      </a>
+      </div>
     </Link>
   );
 }
+
+
+
+
+
 
 function FaqItem({ q, a }: { q: string; a: string }) {
   return (
