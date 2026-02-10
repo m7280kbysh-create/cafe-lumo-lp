@@ -12,8 +12,25 @@ const reveal = {
 
 export default function Hub() {
   return (
-    <div className="bg-background text-foreground min-h-screen">
-      {/* HERO */}
+    <div className="min-h-screen text-slate-100 bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950">
+      {/* page background accents (outside the boxes) */}
+      <div className="pointer-events-none fixed inset-0">
+        <div className="absolute -top-48 left-1/2 -translate-x-1/2 h-[820px] w-[820px] rounded-full bg-blue-500/18 blur-3xl" />
+        <div className="absolute -bottom-56 -right-56 h-[820px] w-[820px] rounded-full bg-cyan-400/12 blur-3xl" />
+        <div
+          className="absolute inset-0 opacity-[0.06]"
+          style={{
+            backgroundImage:
+              "linear-gradient(to right, rgba(148,163,184,0.35) 1px, transparent 1px), linear-gradient(to bottom, rgba(148,163,184,0.35) 1px, transparent 1px)",
+            backgroundSize: "56px 56px",
+            maskImage: "radial-gradient(900px circle at 30% 0%, black, transparent 65%)",
+            WebkitMaskImage: "radial-gradient(900px circle at 30% 0%, black, transparent 65%)",
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/10 to-slate-950/35" />
+      </div>
+
+      {/* HERO (keep the “premium” photo feel) */}
       <header className="relative overflow-hidden">
         <div className="absolute inset-0">
           <img
@@ -21,19 +38,25 @@ export default function Hub() {
             alt="上質で落ち着いた空間（架空デモ）"
             className="h-full w-full object-cover"
             loading="eager"
+            decoding="async"
           />
-          {/* ベール（読みやすさ＋高級感） */}
-          <div className="absolute inset-0 bg-black/45" />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/25 to-background" />
+          {/* veil */}
+          <div className="absolute inset-0 bg-slate-950/60" />
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-slate-950/35 to-slate-950" />
+          {/* blue nuance */}
+          <div className="absolute -top-28 -left-28 h-[560px] w-[560px] rounded-full bg-blue-500/18 blur-3xl" />
+          <div className="absolute -bottom-36 -right-36 h-[700px] w-[700px] rounded-full bg-cyan-400/12 blur-3xl" />
+          <div className="absolute inset-0 bg-[radial-gradient(900px_circle_at_15%_0%,rgba(59,130,246,0.14),transparent_55%)]" />
         </div>
 
         <div className="relative container mx-auto px-6 py-16 md:py-24">
           <div className="max-w-3xl">
-            <p className="text-white/80 text-sm tracking-wide">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs text-white/80 backdrop-blur">
+              <span className="inline-block h-2 w-2 rounded-full bg-blue-400" />
               店舗向けLP制作（ポートフォリオ）
-            </p>
+            </div>
 
-            <h1 className="mt-4 text-4xl md:text-6xl font-extrabold leading-tight tracking-tight text-white">
+            <h1 className="mt-5 text-4xl md:text-6xl font-extrabold leading-tight tracking-tight text-white">
               静かに整う導線で、
               <br />
               来店につなげる。
@@ -48,19 +71,19 @@ export default function Hub() {
             <div className="mt-10 flex flex-col sm:flex-row gap-3">
               <a
                 href="#demos"
-                className="inline-flex items-center justify-center rounded-full bg-white text-black px-7 py-3 text-sm font-semibold hover:bg-white/90 transition"
+                className="inline-flex items-center justify-center rounded-full bg-blue-600 text-white px-7 py-3 text-sm font-semibold hover:bg-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-400/35"
               >
                 デモを見る
               </a>
               <a
                 href="#contact"
-                className="inline-flex items-center justify-center rounded-full border border-white/35 bg-white/10 text-white px-7 py-3 text-sm font-semibold hover:bg-white/15 transition"
+                className="inline-flex items-center justify-center rounded-full border border-white/25 bg-white/10 text-white px-7 py-3 text-sm font-semibold hover:bg-white/15 transition focus:outline-none focus:ring-2 focus:ring-white/25"
               >
                 相談する（無料）
               </a>
             </div>
 
-            <p className="mt-6 text-xs text-white/70">
+            <p className="mt-6 text-xs text-white/65">
               ※本サイトは架空のデモ（ポートフォリオ）です。実在の店舗・人物・団体とは関係ありません。
             </p>
           </div>
@@ -73,45 +96,52 @@ export default function Hub() {
           <div className="mx-auto max-w-5xl">
             <div className="grid gap-10 md:grid-cols-2 md:items-start">
               <div>
-                <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
+                <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white">
                   提供内容（概要）
                 </h2>
-                <p className="mt-4 text-muted-foreground leading-relaxed">
+                <p className="mt-4 text-slate-300 leading-relaxed">
                   伝えることを増やすのではなく、迷いを減らします。
                   <br />
                   “予約/問い合わせまでの道筋”を整えるLPです。
                 </p>
+
+                <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 backdrop-blur">
+                  <div className="text-xs text-slate-300">
+                    初月は「範囲を固定して速く公開」→必要な箇所だけ強化、の流れが最短です。
+                  </div>
+                </div>
               </div>
 
-              <div className="rounded-2xl border border-border bg-card p-6">
+              {/* box inside should keep the same light tone */}
+              <div className="rounded-2xl border border-slate-200/80 bg-white/90 p-6 text-slate-900 shadow-[0_14px_60px_rgba(15,23,42,0.20)]">
                 <div className="flex items-baseline gap-2">
-                  <div className="text-3xl font-bold">初月 5,000円〜</div>
-                  <div className="text-sm text-muted-foreground">（買い切り・範囲固定）</div>
+                  <div className="text-3xl font-extrabold">初月 5,000円〜</div>
+                  <div className="text-sm text-slate-600">（買い切り・範囲固定）</div>
                 </div>
-                <p className="mt-2 text-sm text-muted-foreground">
+                <p className="mt-2 text-sm text-slate-600">
                   素材が揃っていれば最短2〜3日で公開可能（内容により変動）
                 </p>
 
                 <ul className="mt-5 space-y-2 text-sm">
                   <li className="flex gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 rounded-full bg-foreground/60" />
+                    <span className="mt-2 h-1.5 w-1.5 rounded-full bg-blue-600" />
                     <span>スマホ最適化の1ページLP</span>
                   </li>
                   <li className="flex gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 rounded-full bg-foreground/60" />
+                    <span className="mt-2 h-1.5 w-1.5 rounded-full bg-blue-600" />
                     <span>予約/問い合わせ導線（LINE・電話・予約サイト等）を整理</span>
                   </li>
                   <li className="flex gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 rounded-full bg-foreground/60" />
+                    <span className="mt-2 h-1.5 w-1.5 rounded-full bg-blue-600" />
                     <span>テキスト/画像差し替え（修正1回まで）</span>
                   </li>
                   <li className="flex gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 rounded-full bg-foreground/60" />
+                    <span className="mt-2 h-1.5 w-1.5 rounded-full bg-blue-600" />
                     <span>公開まで対応（独自ドメインはオプション）</span>
                   </li>
                 </ul>
 
-                <p className="mt-4 text-xs text-muted-foreground">
+                <p className="mt-4 text-xs text-slate-500">
                   ※実案件では、制作範囲・修正回数・納期を事前に合意して進行します。
                 </p>
               </div>
@@ -120,9 +150,9 @@ export default function Hub() {
         </MotionSection>
 
         {/* PROCESS */}
-        <MotionSection className="py-16 md:py-24 bg-card border-y border-border">
+        <MotionSection className="py-16 md:py-24">
           <div className="mx-auto max-w-5xl">
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-center">
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-center text-white">
               制作の流れ
             </h2>
 
@@ -139,10 +169,10 @@ export default function Hub() {
         <MotionSection id="demos" className="py-16 md:py-24">
           <div className="mx-auto max-w-6xl">
             <div className="text-center">
-              <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
+              <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white">
                 業種別デモ（架空）
               </h2>
-              <p className="mt-4 text-muted-foreground">
+              <p className="mt-4 text-slate-300">
                 1クリックで“完成イメージ”が見えるようにしています。
               </p>
             </div>
@@ -168,16 +198,16 @@ export default function Hub() {
               />
             </div>
 
-            <p className="mt-6 text-center text-xs text-muted-foreground">
+            <p className="mt-6 text-center text-xs text-slate-400">
               ※各ページは架空店舗のデモ（ポートフォリオ）です。実在のレビューや実在店舗を装いません。
             </p>
           </div>
         </MotionSection>
 
         {/* FAQ */}
-        <MotionSection className="py-16 md:py-24 bg-card border-y border-border">
+        <MotionSection className="py-16 md:py-24">
           <div className="mx-auto max-w-4xl">
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-center">
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-center text-white">
               よくあるご質問
             </h2>
 
@@ -208,23 +238,31 @@ export default function Hub() {
 
         {/* CONTACT */}
         <MotionSection id="contact" className="py-16 md:py-24">
-          <div className="mx-auto max-w-4xl rounded-2xl border border-border bg-card p-8 md:p-10">
+          {/* big light box: keep tone */}
+          <div className="mx-auto max-w-4xl rounded-2xl border border-slate-200/80 bg-white/90 p-8 md:p-10 text-slate-900 shadow-[0_14px_60px_rgba(15,23,42,0.20)]">
             <div className="grid gap-8 md:grid-cols-2 md:items-center">
               <div>
-                <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
+                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">
                   まずは相談だけでも
                 </h2>
-                <p className="mt-3 text-muted-foreground">
+                <p className="mt-3 text-slate-600">
                   「いまの導線だと、何がもったいないか」から一緒に整理します。
                   <br />
                   相談・見積もりは無料（サンプル）です。
                 </p>
+
+                <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-5">
+                  <div className="text-xs font-semibold text-slate-500">相談時にあると早いもの</div>
+                  <div className="mt-2 text-sm text-slate-600 leading-relaxed">
+                    店名 / メニュー / 予約URL（LINE等） / 写真（数枚） / エリア / 営業時間
+                  </div>
+                </div>
               </div>
 
               <div className="flex flex-col gap-3">
                 <a
                   href="mailto:your-email@example.com"
-                  className="inline-flex items-center justify-center rounded-full bg-foreground text-background px-6 py-3 text-sm font-semibold hover:opacity-90 transition"
+                  className="inline-flex items-center justify-center rounded-full bg-blue-600 text-white px-6 py-3 text-sm font-semibold hover:bg-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-500/35"
                 >
                   メールで相談する
                 </a>
@@ -232,11 +270,11 @@ export default function Hub() {
                   href="https://instagram.com/your_account"
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center justify-center rounded-full border border-border bg-background px-6 py-3 text-sm font-semibold hover:bg-muted transition"
+                  className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-semibold hover:border-blue-300 hover:text-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                 >
                   Instagramへ
                 </a>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-slate-500">
                   ※リンク先はあなたの連絡先に差し替えてください
                 </p>
               </div>
@@ -245,7 +283,7 @@ export default function Hub() {
         </MotionSection>
       </main>
 
-      <footer className="py-10 text-center text-xs text-muted-foreground">
+      <footer className="py-10 text-center text-xs text-slate-400">
         【注意】本サイトは架空の店舗・サービスを用いたデモ（ポートフォリオ）です。
       </footer>
     </div>
@@ -279,27 +317,37 @@ function MotionSection({
 
 function StepCard({ num, title, desc }: { num: string; title: string; desc: string }) {
   return (
-    <div className="rounded-2xl border border-border bg-background p-6">
-      <div className="text-xs text-muted-foreground tracking-wider">{num}</div>
-      <div className="mt-2 text-lg font-semibold">{title}</div>
-      <div className="mt-2 text-sm text-muted-foreground leading-relaxed">{desc}</div>
+    <div className="rounded-2xl border border-slate-200/80 bg-white/90 p-6 text-slate-900 shadow-[0_14px_60px_rgba(15,23,42,0.16)]">
+      <div className="inline-flex items-center gap-2">
+        <div className="text-xs font-extrabold tracking-wider text-blue-700">{num}</div>
+        <div className="h-px flex-1 bg-blue-700/15" />
+      </div>
+      <div className="mt-3 text-lg font-bold">{title}</div>
+      <div className="mt-2 text-sm text-slate-600 leading-relaxed">{desc}</div>
     </div>
   );
 }
 
-function DemoCard({ href, title, subtitle, img }: {
-  href: string; title: string; subtitle: string; img: string;
+function DemoCard({
+  href,
+  title,
+  subtitle,
+  img,
+}: {
+  href: string;
+  title: string;
+  subtitle: string;
+  img: string;
 }) {
   return (
     <Link
       href={href}
       className="group relative isolate block overflow-hidden rounded-2xl
-                 border border-border/80 bg-zinc-950 min-h-[280px]
-                 shadow-sm hover:shadow-lg hover:shadow-black/20
+                 border border-white/10 bg-slate-950 min-h-[280px]
+                 shadow-sm hover:shadow-lg hover:shadow-black/35
                  transition-shadow
-                 focus:outline-none focus:ring-2 focus:ring-foreground/30"
+                 focus:outline-none focus:ring-2 focus:ring-blue-400/25"
     >
-      {/* 画像 */}
       <img
         src={img}
         alt={`${title}のイメージ（架空）`}
@@ -311,23 +359,19 @@ function DemoCard({ href, title, subtitle, img }: {
                    group-hover:scale-[1.06]"
       />
 
-      {/* ベースの締め（少し緩め） */}
-      <div className="absolute inset-0 z-10 bg-gradient-to-br from-zinc-950/60 via-zinc-950/25 to-black/60" />
-
-      {/* 可読性：黒ベール（少し緩め） */}
+      <div className="absolute inset-0 z-10 bg-gradient-to-br from-slate-950/65 via-slate-950/25 to-black/65" />
+      <div className="absolute inset-0 z-10 bg-[radial-gradient(700px_circle_at_20%_0%,rgba(59,130,246,0.16),transparent_55%)]" />
       <div className="absolute inset-0 z-20 bg-black/30 group-hover:bg-black/24 transition-colors" />
-
-      {/* 下側を締めて文字を守る */}
       <div className="absolute inset-0 z-20 bg-gradient-to-b from-black/20 via-transparent to-black/70" />
 
-      {/* 艶（上品なハイライト） */}
-      <div className="pointer-events-none absolute inset-0 z-20 opacity-0 group-hover:opacity-100 transition-opacity
-                      bg-[radial-gradient(800px_circle_at_20%_0%,rgba(255,255,255,0.10),transparent_40%)]" />
+      <div
+        className="pointer-events-none absolute inset-0 z-20 opacity-0 group-hover:opacity-100 transition-opacity
+                   bg-[radial-gradient(800px_circle_at_20%_0%,rgba(255,255,255,0.10),transparent_40%)]"
+      />
 
-      {/* コンテンツ */}
       <div className="relative z-30 p-6 h-full flex flex-col justify-end">
         <div className="text-white/70 text-xs tracking-[0.22em]">DEMO</div>
-        <div className="mt-2 text-2xl font-bold text-white drop-shadow-md">{title}</div>
+        <div className="mt-2 text-2xl font-extrabold text-white drop-shadow-md">{title}</div>
         <div className="mt-1 text-white/80 text-sm drop-shadow-sm">{subtitle}</div>
 
         <div className="mt-5 inline-flex items-center gap-2 text-white text-sm font-semibold drop-shadow-sm">
@@ -339,19 +383,14 @@ function DemoCard({ href, title, subtitle, img }: {
   );
 }
 
-
-
-
-
-
 function FaqItem({ q, a }: { q: string; a: string }) {
   return (
-    <details className="rounded-xl border border-border bg-background p-5">
-      <summary className="cursor-pointer font-semibold list-none flex items-center justify-between">
+    <details className="rounded-2xl border border-slate-200/80 bg-white/90 p-5 text-slate-900 shadow-[0_14px_60px_rgba(15,23,42,0.14)]">
+      <summary className="cursor-pointer font-bold list-none flex items-center justify-between">
         <span>{q}</span>
-        <span className="text-muted-foreground">＋</span>
+        <span className="text-blue-700/80">＋</span>
       </summary>
-      <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{a}</p>
+      <p className="mt-3 text-sm text-slate-600 leading-relaxed">{a}</p>
     </details>
   );
 }
