@@ -260,23 +260,29 @@ export default function Hub() {
               </div>
 
               <div className="flex flex-col gap-3">
-                <a
-                  href="mailto:your-email@example.com"
-                  className="inline-flex items-center justify-center rounded-full bg-blue-600 text-white px-6 py-3 text-sm font-semibold hover:bg-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-500/35"
-                >
-                  メールで相談する
-                </a>
-                <a
-                  href="https://instagram.com/your_account"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-semibold hover:border-blue-300 hover:text-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                >
-                  Instagramへ
-                </a>
-                <p className="text-xs text-slate-500">
-                  ※リンク先はあなたの連絡先に差し替えてください
-                </p>
+              <a
+  href={`mailto:mst_t3.01@outlook.jp?subject=${encodeURIComponent(
+    "LP制作の無料相談（ポートフォリオ経由）"
+  )}&body=${encodeURIComponent(
+    "相談内容：\n（例）LP制作の相談をしたいです。\n\n店舗名：\n業種（飲食/美容/整体）：\nエリア：\nInstagram：\n予約導線（LINE/電話/予約URL）：\n希望納期：\n\n（任意）参考URL：\n"
+  )}`}
+  className="inline-flex items-center justify-center rounded-full bg-blue-600 text-white px-6 py-3 text-sm font-semibold hover:bg-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-500/35"
+  aria-label="メールで相談する（メーラーを開きます）"
+>
+  メールで相談する
+</a>
+
+<a
+  href="https://www.instagram.com/lumo_funnel/"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-semibold hover:border-blue-300 hover:text-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+  aria-label="Instagram（@lumo_funnel）を開く"
+>
+  Instagramへ
+</a>
+
+               
               </div>
             </div>
           </div>
