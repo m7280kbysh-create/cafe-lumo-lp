@@ -8,7 +8,7 @@ import Home from "./pages/Home";
 import Hub from "./pages/Hub";
 import Beauty from "./pages/Beauty";
 import Clinic from "./pages/Clinic";
-
+import Coach from "./pages/Coach";
 
 function Router() {
   return (
@@ -17,6 +17,7 @@ function Router() {
   <Route path={"/food"} component={Home} />
   <Route path={"/beauty"} component={Beauty} />
   <Route path={"/clinic"} component={Clinic} />
+  <Route path={"/coach"} component={Coach} />
 
   <Route path={"/404"} component={NotFound} />
   <Route component={NotFound} />

@@ -196,6 +196,12 @@ export default function Hub() {
                 subtitle="初回導線・不安解消・予約導線"
                 img="/demo/hub/clinic.png"
               />
+              <DemoCard
+                href="/coach"
+                title="コーチング"
+                subtitle="クリック導線・申込導線のデモ"
+                img="/demo/hub/coach.png"
+              />
             </div>
 
             <p className="mt-6 text-center text-xs text-slate-400">
