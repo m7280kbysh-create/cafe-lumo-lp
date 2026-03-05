@@ -63,9 +63,9 @@ export default function Hub() {
             </h1>
 
             <p className="mt-6 text-white/80 text-lg md:text-xl leading-relaxed">
-              Instagramのリンク1つから、メニュー・アクセス・予約/問い合わせを
-              <br />
-              1ページにまとめます。迷いを減らして、次のアクションへ。
+              信頼をカタチに。あなたの価値が伝わるLP。
+              
+              
             </p>
 
             <div className="mt-10 flex flex-col sm:flex-row gap-3">
@@ -100,9 +100,10 @@ export default function Hub() {
                   提供内容（概要）
                 </h2>
                 <p className="mt-4 text-slate-300 leading-relaxed">
-                  伝えることを増やすのではなく、迷いを減らします。
+                
+                AIを活用することで、通常10万円以上かかる高品質なLPを1万円〜という価格でスピーディに制作。
                   <br />
-                  “予約/問い合わせまでの道筋”を整えるLPです。
+                  
                 </p>
 
                 <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 backdrop-blur">
@@ -115,7 +116,7 @@ export default function Hub() {
               {/* box inside should keep the same light tone */}
               <div className="rounded-2xl border border-slate-200/80 bg-white/90 p-6 text-slate-900 shadow-[0_14px_60px_rgba(15,23,42,0.20)]">
                 <div className="flex items-baseline gap-2">
-                  <div className="text-3xl font-extrabold">初月 5,000円〜</div>
+                  <div className="text-3xl font-extrabold">初月 10,000円〜</div>
                   <div className="text-sm text-slate-600">（買い切り・範囲固定）</div>
                 </div>
                 <p className="mt-2 text-sm text-slate-600">
@@ -125,20 +126,18 @@ export default function Hub() {
                 <ul className="mt-5 space-y-2 text-sm">
                   <li className="flex gap-2">
                     <span className="mt-2 h-1.5 w-1.5 rounded-full bg-blue-600" />
-                    <span>スマホ最適化の1ページLP</span>
+                    <span>AI生成で文章・画像をゼロから制作
+                    </span>
                   </li>
                   <li className="flex gap-2">
                     <span className="mt-2 h-1.5 w-1.5 rounded-full bg-blue-600" />
-                    <span>予約/問い合わせ導線（LINE・電話・予約サイト等）を整理</span>
+                    <span>最短3日で公開まで対応。</span>
                   </li>
                   <li className="flex gap-2">
                     <span className="mt-2 h-1.5 w-1.5 rounded-full bg-blue-600" />
-                    <span>テキスト/画像差し替え（修正1回まで）</span>
+                    <span>素材なし・アイデアだけでも丸投げOK</span>
                   </li>
-                  <li className="flex gap-2">
-                    <span className="mt-2 h-1.5 w-1.5 rounded-full bg-blue-600" />
-                    <span>公開まで対応（独自ドメインはオプション）</span>
-                  </li>
+                 
                 </ul>
 
                 <p className="mt-4 text-xs text-slate-500">
@@ -254,7 +253,7 @@ export default function Hub() {
                 <p className="mt-3 text-slate-600">
                   「いまの導線だと、何がもったいないか」から一緒に整理します。
                   <br />
-                  相談・見積もりは無料（サンプル）です。
+                  相談・見積もりは無料です。
                 </p>
 
                 <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-5">
