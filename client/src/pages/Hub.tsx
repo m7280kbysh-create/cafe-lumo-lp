@@ -116,7 +116,7 @@ export default function Hub() {
               {/* box inside should keep the same light tone */}
               <div className="rounded-2xl border border-slate-200/80 bg-white/90 p-6 text-slate-900 shadow-[0_14px_60px_rgba(15,23,42,0.20)]">
                 <div className="flex items-baseline gap-2">
-                  <div className="text-3xl font-extrabold">初月 10,000円〜</div>
+                  <div className="text-3xl font-extrabold">初月 30,000円〜</div>
                   <div className="text-sm text-slate-600">（買い切り・範囲固定）</div>
                 </div>
                 <p className="mt-2 text-sm text-slate-600">
@@ -219,24 +219,23 @@ export default function Hub() {
             <div className="mt-10 space-y-4">
               <FaqItem
                 q="素材は何が必要ですか？"
-                a="サービス名・料金・お客様に伝えたいことがあれば制作できます。
-　                  写真や原稿がなくてもAIで対応可能です。"
+                a="サービス名・料金・簡単なプロフィールがあれば制作できます。写真や文章がなくてもAIで生成対応可能です。"
               />
               <FaqItem
                 q="修正は何回まで？"
-                a="初月トライアルは基本1回までを目安に、範囲を固定してスピード優先で進めます。"
+                a="1回まで（テキスト・画像の差し替えのみ）。構成やデザインの大幅変更は別途ご相談ください。"
               />
               <FaqItem
                 q="独自ドメインは必要ですか？"
-                a="ポートフォリオ/試用段階は不要です。本番運用する場合は店舗様名義で取得→接続が安全です。"
-              />
-              <FaqItem
-                q="予約フォームや予約システム連携はできますか？"
-                a="可能です（内容によりオプション）。まずはLINE/電話/既存予約URLに集約する形が早いです。"
+                a="必須ではありません。納品はVercel URLで行います。独自ドメイン（例：yourname.com）への接続はオプション＋5,000円で対応します"
               />
               <FaqItem
                 q="公開後の運用は？"
-                a="更新頻度が少ないLPは“必要なときに直せる”設計が重要。運用方法も合わせて共有します。"
+                a="公開後の軽微な修正は別途ご相談ください。テキストや画像の差し替えであれば対応可能です。"
+              />
+              <FaqItem
+                q="制作期間はどのくらいですか？"
+                a="素材が揃っている場合、最短3日で公開まで対応します。ヒアリングから丁寧に進める場合は1週間程度が目安です。"
               />
             </div>
           </div>
