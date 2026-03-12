@@ -1,752 +1,950 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useLocation } from "wouter";
+// client/src/pages/Clinic.tsx
+// 架空の整体院「静穏整体サロン」LP
+// 全11セクション + 固定ヘッダー + フローティングCTA + フッター
+// カラー: main=#2D6A4F, sub=#74C69D, CTA=#FFD166, bg=#FAF8F3, text=#2C3A2C
 
-// --- Data: Concerns (Symptoms) ---
-const concerns = [
-  {
-    key: "shoulder",
-    label: "肩こり・首の不調",
-    menu: "深層筋アプローチ",
-    time: "50分",
-    policy:
-      "長時間のデスクワークやスマホ利用で固まった筋肉の深層部にアプローチ。緊張を和らげ、巡りを促すことで、肩周りの軽さを目指します。",
-    points: [
-      "首・肩・背中の可動域チェック",
-      "トリガーポイントへの的確なアプローチ",
-      "腕や指先のしびれ感のヒアリング",
-    ],
-  },
-  {
-    key: "lowback",
-    label: "腰の重さ・違和感",
-    menu: "骨盤調整バランスケア",
-    time: "50分",
-    policy:
-      "体の土台である骨盤周りのバランスに着目。関連する股関節や背面の筋肉を丁寧に整え、腰への負担が少ない、安定した状態を目指します。",
-    points: [
-      "立ち姿勢・座り姿勢のバランス確認",
-      "股関節・脚の動きの左右差チェック",
-      "日常生活での負担要因のヒアリング",
-    ],
-  },
-  {
-    key: "posture",
-    label: "姿勢の乱れ・猫背",
-    menu: "体幹コンディショニング",
-    time: "70分",
-    policy:
-      "美しい姿勢は、体の中心である体幹から。呼吸を整えながら、背骨や肩甲骨周りの柔軟性を取り戻し、自然と伸びる体づくりをサポートします。",
-    points: [
-      "壁を使った姿勢のセルフチェック",
-      "肩甲骨周りの柔軟性テスト",
-      "呼吸の深さとリズムの確認",
-    ],
-  },
-  {
-    key: "sleep",
-    label: "睡眠の質・自律神経",
-    menu: "ヘッド＆リラクゼーション",
-    time: "50分",
-    policy:
-      "頭部や首周りの緊張は、思考のクリアさや睡眠の質に影響します。優しいタッチで頭皮をほぐし、深いリラックス状態へ導くことを目指します。",
-    points: [
-      "頭皮の固さ・こりのチェック",
-      "眼の疲れ・顎周りの緊張の確認",
-      "リラックスしやすい環境の提供",
-    ],
-  },
-  {
-    key: "postpartum",
-    label: "産後の骨盤ケア",
-    menu: "産後リカバリーサポート",
-    time: "50分",
-    policy:
-      "出産後のデリケートな時期に合わせた、優しい骨盤ケアです。開いた骨盤をゆっくりと整え、育児でかかる体への負担を軽減するサポートをします。",
-    points: [
-      "骨盤の開き・歪みの状態チェック",
-      "授乳や抱っこでの体の使い方相談",
-      "腹直筋離開の状態の確認",
-    ],
-  },
-] as const;
+import { Link } from "wouter";
+import { motion } from "framer-motion";
+import { useState, type ReactNode } from "react";
 
-type ConcernKey = (typeof concerns)[number]["key"];
+/* ---------- アニメーション設定 ---------- */
+const reveal = {
+  initial: { opacity: 0, y: 22 },
+  whileInView: { opacity: 1, y: 0 },
+  transition: { duration: 0.7, ease: "easeOut" as const },
+  viewport: { once: true, amount: 0.15 },
+};
 
-// --- Scroll Reveal (IntersectionObserver, no libs) ---
-function useInViewOnce<T extends HTMLElement>(options?: IntersectionObserverInit) {
-  const ref = useRef<T | null>(null);
-  const [inView, setInView] = useState(false);
+/* ---------- 見出しフォント ---------- */
+const headingFont: React.CSSProperties = {
+  fontFamily: "'M PLUS Rounded 1c', sans-serif",
+};
 
-  useEffect(() => {
-    if (inView) return;
-    const el = ref.current;
-    if (!el) return;
-
-    const reduce =
-      typeof window !== "undefined" &&
-      window.matchMedia &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    if (reduce) {
-      setInView(true);
-      return;
-    }
-
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setInView(true);
-          io.disconnect();
-        }
-      },
-      { root: null, threshold: 0.15, rootMargin: "0px 0px -10% 0px", ...options }
-    );
-
-    io.observe(el);
-    return () => io.disconnect();
-  }, [inView, options]);
-
-  return { ref, inView };
-}
-
-function Reveal({
-  children,
-  className = "",
-  delayMs = 0,
-}: {
-  children: React.ReactNode;
-  className?: string;
-  delayMs?: number;
-}) {
-  const { ref, inView } = useInViewOnce<HTMLDivElement>();
+/* ============================
+   メインコンポーネント
+  ============================ */
+export default function Clinic() {
   return (
     <div
-      ref={ref}
-      style={{ transitionDelay: `${delayMs}ms` }}
-      className={[
-        "transition-all duration-700 ease-out will-change-transform",
-        inView ? "opacity-100 translate-y-0 blur-0" : "opacity-0 translate-y-6 blur-[2px]",
-        className,
-      ].join(" ")}
+      className="min-h-screen bg-[#FAF8F3] text-[#2C3A2C]"
+      style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
     >
-      {children}
-    </div>
-  );
-}
-
-// --- Hook: concern selector synced with ?concern= ---
-const useConcern = () => {
-  const [location, navigate] = useLocation();
-
-  const url = useMemo(() => new URL(location, "https://local.example"), [location]);
-
-  const activeKey = useMemo(() => {
-    const key = url.searchParams.get("concern");
-    return key && concerns.some((c) => c.key === key) ? (key as ConcernKey) : concerns[0].key;
-  }, [url]);
-
-  const activeConcern = useMemo(
-    () => concerns.find((c) => c.key === activeKey) || concerns[0],
-    [activeKey]
-  );
-
-  const selectConcern = (key: ConcernKey) => {
-    const next = new URL(location, "https://local.example");
-    next.searchParams.set("concern", key);
-    const qs = next.searchParams.toString();
-    navigate(qs ? `${next.pathname}?${qs}` : next.pathname, { replace: true });
-  };
-
-  return { activeKey, selectConcern, activeConcern };
-};
-
-// --- Main Component ---
-const Clinic = () => {
-  return (
-    <div className="bg-[#061412] text-gray-200 font-sans selection:bg-teal-400/30">
-      <Header />
-      <main>
-        <HeroSection />
-        <ConcernSelector />
-        <ReasonsSection />
-        <FlowSection />
-        <MenuSection />
-        <GallerySection />
-        <FaqSection />
-        <ContactSection />
-        <AccessSection />
-      </main>
-      <Footer />
-    </div>
-  );
-};
-
-// --- Page Sections ---
-const Header = () => (
-  <header className="sticky top-0 bg-[#061412]/70 backdrop-blur-lg z-50 border-b border-white/10">
-    <div className="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
-      <Link href="/" className="text-sm text-gray-400 hover:text-white transition-colors duration-300">
-        ← 提供内容一覧へ戻る
-      </Link>
-
-      <a
-        href="#contact"
-        className="px-5 py-2 rounded-full text-sm font-semibold bg-gray-200 text-gray-800 hover:bg-white
-                   focus:outline-none focus:ring-2 focus:ring-teal-400 focus:ring-offset-2
-                   focus:ring-offset-[#061412] transition-colors duration-300"
-      >
-        ご予約
-      </a>
-    </div>
-  </header>
-);
-
-const HeroSection = () => (
-  <section className="relative h-[90vh] min-h-[650px] flex items-center justify-center text-center text-white px-4 sm:px-6 overflow-hidden">
-    {/* Background */}
-    <div className="absolute inset-0 bg-[#061412]">
-      <img
-        src="/demo/clinic/hero.png"
-        alt="静かで落ち着いた施術室の風景（架空）"
-        className="w-full h-full object-cover opacity-35"
-        loading="eager"
-        decoding="async"
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#061412] via-[#061412]/35 to-[#061412]/70" />
-      <div className="absolute -top-24 -left-24 h-[420px] w-[420px] rounded-full bg-teal-400/10 blur-3xl" />
-      <div className="absolute -bottom-24 -right-24 h-[520px] w-[520px] rounded-full bg-emerald-300/5 blur-3xl" />
-    </div>
-
-    <div className="relative z-10 max-w-3xl">
-      <Reveal>
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif font-medium tracking-wider leading-tight">
-          静かに整う。
-          <br />
-          <span className="text-3xl sm:text-4xl md:text-5xl text-white/90">日常が、軽くなる。</span>
-        </h1>
-      </Reveal>
-
-      <Reveal delayMs={100}>
-        <p className="mt-6 max-w-2xl mx-auto text-gray-300 leading-relaxed">
-          目黒のプライベート整体サロン「静穏」（架空）。
-          <br />
-          一人ひとりの身体と向き合い、今の状態に寄り添う丁寧な施術を。
-        </p>
-      </Reveal>
-
-      <Reveal delayMs={180} className="mt-10">
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a
-            href="#concerns"
-            className="w-full sm:w-auto px-8 py-3 rounded-full font-semibold bg-white text-gray-900 hover:bg-gray-200
-                       focus:outline-none focus:ring-2 focus:ring-teal-400 focus:ring-offset-2
-                       focus:ring-offset-[#061412] transition-all duration-300"
+      {/* ============================
+          固定ヘッダー
+         ============================ */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-[#FAF8F3]/90 backdrop-blur-md border-b border-[#2D6A4F]/15">
+        <div className="container mx-auto px-4 md:px-6 flex items-center justify-between h-14 md:h-16">
+          {/* サロン名 */}
+          <span
+            className="text-lg md:text-xl font-bold text-[#2D6A4F]"
+            style={headingFont}
           >
-            お悩みから探す
-          </a>
+            静穏整体サロン
+          </span>
+          {/* ヘッダーCTAボタン */}
           <a
-            href="#contact"
-            className="w-full sm:w-auto px-8 py-3 rounded-full font-semibold border border-white/50 text-white hover:bg-white/10
-                       focus:outline-none focus:ring-2 focus:ring-teal-400 focus:ring-offset-2
-                       focus:ring-offset-[#061412] transition-colors duration-300"
+            href="#final-cta"
+            className="inline-flex items-center justify-center rounded-full bg-[#FFD166] text-[#2D6A4F] px-4 py-2 md:px-6 md:py-2.5 text-xs md:text-sm font-bold hover:brightness-95 transition shadow-md"
           >
-            ご予約・お問い合わせ
+            初回予約はこちら
           </a>
         </div>
-      </Reveal>
+      </header>
 
-      <Reveal delayMs={260} className="mt-10">
-        <p className="text-xs text-white/60">
-          ※本ページは架空店舗のデモ（ポートフォリオ）です。医療的な効果を保証する表現は行いません。
-        </p>
-      </Reveal>
-    </div>
-  </section>
-);
+      {/* ============================
+          セクション1: ファーストビュー（FV / Hero）
+         ============================ */}
+      <section className="relative overflow-hidden pt-16">
+        {/* 背景画像 + グリーン系オーバーレイ */}
+        <div className="absolute inset-0">
+          <img
+            src="/demo/clinic/hero.png"
+            alt="静穏整体サロンの落ち着いた院内（架空デモ）"
+            className="h-full w-full object-cover"
+            loading="eager"
+            decoding="async"
+          />
+          {/* プレースホルダー */}
+          <div className="img-clinic-hero absolute inset-0 bg-gradient-to-br from-[#2D6A4F]/60 to-[#2D6A4F]/40 flex items-center justify-center">
+            <span className="text-white/20 text-sm">院内・施術風景</span>
+          </div>
+          {/* グリーンオーバーレイ */}
+          <div className="absolute inset-0 bg-[#2D6A4F]/55" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#2D6A4F]/20 via-transparent to-[#2C3A2C]/50" />
+        </div>
 
-const ConcernSelector = () => {
-  const { activeKey, selectConcern, activeConcern } = useConcern();
+        <div className="relative container mx-auto px-6 py-24 md:py-36">
+          <div className="max-w-3xl">
+            {/* キャッチコピー */}
+            <h1
+              className="text-3xl sm:text-4xl md:text-6xl font-extrabold leading-tight tracking-tight text-white whitespace-pre-line"
+              style={headingFont}
+            >
+              {"その痛み、\nあきらめないでください。"}
+            </h1>
 
-  return (
-    <section id="concerns" className="py-20 md:py-28 relative overflow-hidden">
-      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-[#061412] to-[#0B1220]" />
-      <div className="absolute -top-24 left-1/2 -translate-x-1/2 -z-10 h-[520px] w-[720px] rounded-full bg-teal-500/5 blur-3xl" />
+            {/* サブコピー */}
+            <p className="mt-6 text-white/90 text-base md:text-xl leading-relaxed whitespace-pre-line">
+              {"目黒のプライベート整体サロン。\nあなたの体と丁寧に向き合います。"}
+            </p>
 
-      <div className="container mx-auto px-4 sm:px-6">
-        <Reveal className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-serif font-medium">お悩みから探す</h2>
-          <p className="mt-4 text-gray-400">気になる症状を選ぶと、おすすめ内容が切り替わります。</p>
-        </Reveal>
-
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Tabs */}
-          <Reveal className="lg:w-1/4">
-            <div className="flex lg:flex-col overflow-x-auto -mx-4 px-4 lg:mx-0 lg:px-0 pb-4 lg:pb-0">
-              <div className="flex lg:flex-col gap-2 flex-shrink-0">
-                {concerns.map((concern) => (
-                  <button
-                    key={concern.key}
-                    onClick={() => selectConcern(concern.key)}
-                    aria-pressed={activeKey === concern.key}
-                    className={`w-full text-left px-4 py-3 rounded-md text-sm font-semibold transition-all duration-300
-                                focus:outline-none focus:ring-2 focus:ring-teal-400/80 ${
-                                  activeKey === concern.key
-                                    ? "bg-white/10 text-white"
-                                    : "text-gray-400 hover:bg-white/5 hover:text-gray-200"
-                                }`}
-                  >
-                    {concern.label}
-                  </button>
-                ))}
-              </div>
+            {/* 数値バッジ3点 */}
+            <div className="mt-8 flex flex-wrap gap-4">
+              {[
+                { value: "10,000件+", label: "施術実績" },
+                { value: "89%", label: "リピート率" },
+                { value: "創業12年", label: "" },
+              ].map((badge, i) => (
+                <div
+                  key={i}
+                  className="rounded-xl bg-white/15 backdrop-blur px-5 py-3 text-center border border-white/20"
+                >
+                  <div className="text-xl md:text-2xl font-extrabold text-white">
+                    {badge.value}
+                  </div>
+                  {badge.label && (
+                    <div className="text-xs text-white/80 mt-1">{badge.label}</div>
+                  )}
+                </div>
+              ))}
             </div>
-          </Reveal>
 
-          {/* Content Card */}
-          <Reveal className="lg:w-3/4" delayMs={80}>
-            <div className="relative bg-white/5 border border-white/10 rounded-xl p-6 sm:p-8 backdrop-blur-lg min-h-[420px] overflow-hidden">
-              <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-teal-400/10 blur-3xl" />
-              <div className="absolute -bottom-28 -left-28 h-72 w-72 rounded-full bg-emerald-300/5 blur-3xl" />
+            {/* メインCTA */}
+            <div className="mt-10">
+              <a
+                href="#final-cta"
+                className="inline-flex items-center justify-center rounded-full bg-[#FFD166] text-[#2D6A4F] px-8 py-4 text-lg font-bold hover:brightness-95 transition shadow-lg"
+              >
+                初回限定 ¥3,980で体験する
+              </a>
+            </div>
 
-              <div className="relative">
-                {/* keyで切替時に再描画（軽いフェード感） */}
-                <div key={activeConcern.key} className="transition-opacity duration-300">
-                  <div className="flex justify-between items-start gap-4">
-                    <div>
-                      <span className="inline-block bg-teal-400/10 text-teal-300 text-xs font-bold px-3 py-1 rounded-full mb-3">
-                        おすすめメニュー
+            {/* 安心テキスト */}
+            <p className="mt-4 text-sm text-white/80">
+              ※ 完全予約制 ／ 着替え無料 ／ 無理な施術勧誘なし
+            </p>
+
+            {/* デモ注記 + 医療行為注記 */}
+            <p className="mt-6 text-xs text-white/50 leading-relaxed">
+              ※本ページは架空の整体院を想定したデモ（ポートフォリオ）です。実在の店舗・人物・団体とは一切関係ありません。
+              <br />
+              ※医療行為ではありません。
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <main>
+        {/* ============================
+            セクション2: こんな症状でお悩みではありませんか
+           ============================ */}
+        <MotionSection className="py-16 md:py-24 bg-white">
+          <div className="mx-auto max-w-4xl text-center">
+            <h2
+              className="text-2xl md:text-4xl font-extrabold text-[#2D6A4F]"
+              style={headingFont}
+            >
+              こんな症状でお悩みではありませんか？
+            </h2>
+
+            <div className="mt-10 grid gap-4 md:grid-cols-2 text-left">
+              {[
+                "長時間のデスクワークで肩・首がつらい",
+                "朝起きたときから腰が重い",
+                "頭痛が続いて集中できない",
+                "マッサージに通っても翌日には戻ってしまう",
+                "猫背が気になるが、どうすればいいかわからない",
+                "産後の骨盤の歪みが気になる",
+                "病院では「異常なし」と言われたが不調が続く",
+                "年齢とともに体の回復が遅くなってきた",
+              ].map((text, i) => (
+                <div
+                  key={i}
+                  className="flex items-start gap-3 rounded-xl bg-[#FAF8F3] border border-[#2D6A4F]/15 p-4"
+                >
+                  <span className="text-[#2D6A4F] font-bold text-lg mt-[-2px]">
+                    &#9745;
+                  </span>
+                  <span className="text-sm md:text-base leading-relaxed">
+                    {text}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* 共感コピー */}
+            <p
+              className="mt-8 text-[#2D6A4F] font-bold text-lg md:text-xl"
+              style={headingFont}
+            >
+              ひとつでも当てはまる方、一度ご相談ください。
+            </p>
+          </div>
+        </MotionSection>
+
+        {/* ============================
+            セクション3: 当院の施術アプローチ
+           ============================ */}
+        <MotionSection className="py-16 md:py-24 bg-[#FAF8F3]">
+          <div className="mx-auto max-w-5xl">
+            <div className="text-center mb-12">
+              <h2
+                className="text-2xl md:text-4xl font-extrabold text-[#2D6A4F]"
+                style={headingFont}
+              >
+                なぜ、くり返す不調が
+                <br className="md:hidden" />
+                楽になっていくのか
+              </h2>
+              <p className="mt-4 text-[#2C3A2C]/70 text-base md:text-lg leading-relaxed max-w-2xl mx-auto">
+                表面的な症状だけでなく、体全体のバランスを見ながら
+                根本的な原因にアプローチすることを大切にしています。
+              </p>
+            </div>
+
+            {/* アプローチ3カード */}
+            <div className="grid gap-6 md:grid-cols-3">
+              {[
+                {
+                  num: "01",
+                  title: "体全体のバランスを整える",
+                  desc: "痛みのある箇所だけでなく、全身の筋肉・骨格のバランスを確認し、体が本来持っている調和を取り戻すサポートをします。",
+                },
+                {
+                  num: "02",
+                  title: "一人ひとりに合わせた施術",
+                  desc: "カウンセリングと検査をもとに、オーダーメイドの施術プランを作成。お体の状態に寄り添った丁寧なアプローチを行います。",
+                },
+                {
+                  num: "03",
+                  title: "セルフケアで持続をサポート",
+                  desc: "施術後のストレッチや生活習慣のアドバイスで、良い状態をキープすることを目指します。ご自宅でもできるケアをお伝えします。",
+                },
+              ].map((item) => (
+                <div
+                  key={item.num}
+                  className="rounded-2xl border-2 border-[#2D6A4F]/15 bg-white p-6 relative shadow-sm"
+                >
+                  <div className="text-4xl font-extrabold text-[#74C69D]/30 absolute top-4 right-4">
+                    {item.num}
+                  </div>
+                  <h3
+                    className="text-lg font-bold text-[#2C3A2C] mb-3 mt-2 pr-10"
+                    style={headingFont}
+                  >
+                    {item.title}
+                  </h3>
+                  <p className="text-sm text-[#2C3A2C]/70 leading-relaxed">
+                    {item.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* 個人差注記 */}
+            <p className="mt-6 text-xs text-[#2C3A2C]/40 text-center">
+              ※効果には個人差があります
+            </p>
+          </div>
+        </MotionSection>
+
+        {/* ============================
+            セクション4: 選ばれる理由3点
+           ============================ */}
+        <MotionSection className="py-16 md:py-24 bg-white">
+          <div className="mx-auto max-w-5xl">
+            <div className="text-center mb-12">
+              <h2
+                className="text-2xl md:text-4xl font-extrabold text-[#2D6A4F]"
+                style={headingFont}
+              >
+                選ばれる理由
+              </h2>
+            </div>
+
+            <div className="grid gap-6 md:grid-cols-3">
+              {[
+                {
+                  title: "国家資格保有の施術者",
+                  desc: "柔道整復師の資格を持つ院長が全施術を担当。確かな知識と技術で、安心してお任せいただけます。（架空）",
+                },
+                {
+                  title: "完全予約制・個室対応",
+                  desc: "他のお客様と重ならない、あなただけの時間。周りを気にせずリラックスして施術を受けていただけます。",
+                },
+                {
+                  title: "丁寧なカウンセリング",
+                  desc: "初回30分以上かけて、お体の状態と生活習慣をヒアリング。お悩みをじっくりお伺いしたうえで施術に入ります。",
+                },
+              ].map((item, i) => (
+                <div
+                  key={i}
+                  className="rounded-2xl bg-[#FAF8F3] border border-[#2D6A4F]/15 p-8 shadow-sm hover:shadow-md transition text-center"
+                >
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#2D6A4F]/10 flex items-center justify-center">
+                    <span className="text-2xl text-[#2D6A4F]">
+                      {i === 0 ? "🎓" : i === 1 ? "🔒" : "💬"}
+                    </span>
+                  </div>
+                  <h3
+                    className="text-lg font-bold text-[#2C3A2C] mb-3"
+                    style={headingFont}
+                  >
+                    {item.title}
+                  </h3>
+                  <p className="text-sm text-[#2C3A2C]/70 leading-relaxed">
+                    {item.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </MotionSection>
+
+        {/* ============================
+            セクション5: 施術メニュー・料金
+           ============================ */}
+        <MotionSection id="pricing" className="py-16 md:py-24 bg-[#FAF8F3]">
+          <div className="mx-auto max-w-4xl">
+            <div className="text-center mb-12">
+              <h2
+                className="text-2xl md:text-4xl font-extrabold text-[#2D6A4F]"
+                style={headingFont}
+              >
+                施術メニュー・料金
+              </h2>
+            </div>
+
+            {/* メニュー表 */}
+            <div className="grid gap-4">
+              {[
+                {
+                  name: "【初回限定】お試しコース",
+                  time: "約70分",
+                  price: "¥3,980",
+                  originalPrice: "¥6,600",
+                  highlight: true,
+                },
+                {
+                  name: "通常メンテナンスコース",
+                  time: "約50分",
+                  price: "¥6,600",
+                  originalPrice: null,
+                  highlight: false,
+                },
+                {
+                  name: "集中ケアコース",
+                  time: "約80分",
+                  price: "¥9,900",
+                  originalPrice: null,
+                  highlight: false,
+                },
+                {
+                  name: "産後骨盤ケア",
+                  time: "約50分",
+                  price: "¥6,600",
+                  originalPrice: null,
+                  highlight: false,
+                },
+                {
+                  name: "自律神経調整コース",
+                  time: "約60分",
+                  price: "¥7,700",
+                  originalPrice: null,
+                  highlight: false,
+                },
+              ].map((menu, i) => (
+                <div
+                  key={i}
+                  className={`rounded-xl p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 ${
+                    menu.highlight
+                      ? "bg-[#FFD166]/15 border-2 border-[#FFD166]/50"
+                      : "bg-white border border-[#2D6A4F]/10"
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3
+                        className="text-base font-bold text-[#2C3A2C]"
+                        style={headingFont}
+                      >
+                        {menu.name}
+                      </h3>
+                      {menu.highlight && (
+                        <span className="text-xs bg-[#FFD166] text-[#2D6A4F] px-2 py-0.5 rounded-full font-bold">
+                          おすすめ
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-baseline gap-2 sm:text-right">
+                    <span className="text-xs text-[#2C3A2C]/50">{menu.time}</span>
+                    {menu.originalPrice && (
+                      <span className="text-sm text-[#2C3A2C]/40 line-through">
+                        {menu.originalPrice}
                       </span>
-                      <h3 className="text-2xl sm:text-3xl font-serif font-medium">{activeConcern.menu}</h3>
-                    </div>
-                    <div className="text-right flex-shrink-0">
-                      <p className="text-xl sm:text-2xl font-bold">{activeConcern.time}</p>
-                      <p className="text-sm text-gray-400">目安</p>
-                    </div>
+                    )}
+                    <span className="text-2xl font-extrabold text-[#2C3A2C]">
+                      {menu.price}
+                    </span>
                   </div>
+                </div>
+              ))}
+            </div>
 
-                  <div className="w-full h-px bg-white/10 my-6" />
+            {/* 注記 */}
+            <div className="mt-6 space-y-1 text-xs text-[#2C3A2C]/50">
+              <p>※すべて税込（架空）</p>
+              <p>※保険適用外の自費施術です</p>
+              <p>※通院頻度の目安：最初は週1回、安定後は月1〜2回</p>
+            </div>
+          </div>
+        </MotionSection>
 
-                  <div className="grid md:grid-cols-2 gap-8">
-                    <div>
-                      <h4 className="font-bold text-white mb-3">施術方針</h4>
-                      <p className="text-gray-300 leading-relaxed">{activeConcern.policy}</p>
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-white mb-3">初回のチェックポイント</h4>
-                      <ul className="space-y-2">
-                        {activeConcern.points.map((point, i) => (
-                          <li key={i} className="flex items-start">
-                            <svg
-                              className="w-4 h-4 mr-3 mt-1 text-teal-400 flex-shrink-0"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                              aria-hidden="true"
-                            >
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
-                            <span className="text-gray-300">{point}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
+        {/* ============================
+            セクション6: 院長紹介
+           ============================ */}
+        <MotionSection className="py-16 md:py-24 bg-white">
+          <div className="mx-auto max-w-4xl">
+            <div className="text-center mb-10">
+              <h2
+                className="text-2xl md:text-4xl font-extrabold text-[#2D6A4F]"
+                style={headingFont}
+              >
+                院長紹介
+              </h2>
+            </div>
 
-                  <div className="mt-8 text-center">
-                    <a
-                      href="#contact"
-                      className="inline-block px-8 py-3 rounded-full font-semibold bg-teal-500 text-white hover:bg-teal-600
-                                 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:ring-offset-2
-                                 focus:ring-offset-[#0B1220] transition-colors duration-300"
-                    >
-                      「{activeConcern.label}」について相談・予約する
-                    </a>
-                    <p className="mt-3 text-xs text-gray-500">
-                      ※症状や状態によって内容は変わります。無理のない範囲でご相談ください。（架空）
+            <div className="rounded-2xl bg-[#FAF8F3] border border-[#2D6A4F]/15 p-6 md:p-10 shadow-sm">
+              <div className="flex flex-col md:flex-row gap-6 md:gap-10 items-start">
+                {/* 院長写真 */}
+                <div className="w-36 h-36 rounded-full overflow-hidden border-2 border-[#2D6A4F]/20 mx-auto md:mx-0 flex-shrink-0">
+                  <img
+                    src="/demo/clinic/staff.png"
+                    alt="院長 田中一朗（架空）"
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+
+                <div className="flex-1">
+                  <h3
+                    className="text-xl font-bold text-[#2C3A2C]"
+                    style={headingFont}
+                  >
+                    院長　田中 一朗（架空）
+                  </h3>
+                  <p className="text-sm text-[#2C3A2C]/60 mt-1">
+                    柔道整復師（架空）／ はり師・きゅう師（架空）
+                  </p>
+
+                  {/* 経歴 */}
+                  <div className="mt-4 text-sm text-[#2C3A2C]/80 leading-relaxed space-y-2">
+                    <p>
+                      <span className="font-bold text-[#2D6A4F]">経歴：</span>
+                      整形外科にて5年間の臨床経験を積んだのち、地域の方に寄り添える場を作りたいという想いから独立。目黒に「静穏整体サロン」を開業（架空）。
+                    </p>
+                    <p>
+                      <span className="font-bold text-[#2D6A4F]">メッセージ：</span>
+                      「お体の不調には、必ず何かしらの理由があります。その声に耳を傾け、一緒に原因を探り、あなたらしい毎日を取り戻すお手伝いがしたい。そんな想いで日々施術に向き合っています。」
                     </p>
                   </div>
                 </div>
               </div>
+
+              {/* スタッフ */}
+              <div className="mt-8 pt-6 border-t border-[#2D6A4F]/10 flex items-center gap-4">
+                <div className="w-24 h-24 rounded-full overflow-hidden border border-[#2D6A4F]/15 flex-shrink-0">
+                  <img
+                    src="/demo/clinic/staff-2.png"
+                    alt="スタッフ 佐藤（架空）"
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-[#2C3A2C]" style={headingFont}>
+                    スタッフ　佐藤（架空）
+                  </p>
+                  <p className="text-xs text-[#2C3A2C]/60 mt-1">
+                    受付・サポート担当。お気軽にお声がけください。
+                  </p>
+                </div>
+              </div>
             </div>
-          </Reveal>
-        </div>
-      </div>
-    </section>
-  );
-};
-
-const ReasonsSection = () => (
-  <section className="py-20 md:py-28 relative">
-    <div className="absolute top-0 left-0 w-1/2 h-1/2 bg-gradient-to-br from-teal-500/5 to-transparent -z-10" />
-    <div className="container mx-auto px-4 sm:px-6">
-      <Reveal className="text-center mb-12">
-        <h2 className="text-3xl md:text-4xl font-serif font-medium">静穏が選ばれる理由</h2>
-      </Reveal>
-
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
-        <Reveal delayMs={0}>
-          <ReasonCard
-            title="丁寧なカウンセリング"
-            description="初回は特に時間をかけ、お悩みや生活習慣をヒアリング。今の状態を共有しながら進めます。"
-          />
-        </Reveal>
-        <Reveal delayMs={80}>
-          <ReasonCard
-            title="完全予約・個室空間"
-            description="あなただけの時間を確保。周りを気にせず、静かな環境でリラックスして受けていただけます。"
-          />
-        </Reveal>
-        <Reveal delayMs={160}>
-          <ReasonCard
-            title="セルフケアのご提案"
-            description="施術後の状態に合わせて、ご自宅でできる簡単なストレッチや生活習慣の工夫をご提案します。"
-          />
-        </Reveal>
-        <Reveal delayMs={240}>
-          <ReasonCard
-            title="清潔で落ち着いた院内"
-            description="衛生管理を徹底し、清潔な空間を維持。落ち着く照明と香りで、五感から整える時間を。"
-          />
-        </Reveal>
-      </div>
-    </div>
-  </section>
-);
-
-const FlowSection = () => (
-  <section className="py-20 md:py-28 bg-[#0B1220]">
-    <div className="container mx-auto px-4 sm:px-6">
-      <Reveal className="text-center mb-16">
-        <h2 className="text-3xl md:text-4xl font-serif font-medium">初めての方へ（施術の流れ）</h2>
-        <p className="mt-4 text-gray-400">不安が残らないよう、流れと目的を丁寧に共有します。（架空）</p>
-      </Reveal>
-
-      <div className="relative max-w-4xl mx-auto">
-        <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-white/10 -translate-x-1/2" />
-
-        <FlowStep
-          delayMs={0}
-          number="01"
-          title="カウンセリング"
-          description="専用シートにご記入いただき、生活習慣や気になる点を詳しくお伺いします。"
-        />
-        <FlowStep
-          delayMs={90}
-          number="02"
-          title="検査・状態の確認"
-          description="体の動きやバランスを確認し、現状と方針を分かりやすく共有します。"
-        />
-        <FlowStep
-          delayMs={180}
-          number="03"
-          title="オーダーメイド施術"
-          description="状態に合わせた手技で進行。力加減は都度お声がけし、無理のない範囲で行います。"
-        />
-        <FlowStep
-          delayMs={270}
-          number="04"
-          title="アフターケア提案"
-          description="変化を確認し、ご自宅でできるセルフケアや次回目安をご提案します。"
-        />
-      </div>
-    </div>
-  </section>
-);
-
-const MenuSection = () => (
-  <section className="py-20 md:py-28">
-    <div className="container mx-auto px-4 sm:px-6">
-      <Reveal className="text-center mb-12">
-        <h2 className="text-3xl md:text-4xl font-serif font-medium">メニュー・料金</h2>
-        <p className="mt-4 text-gray-400">料金はすべて税込です。（架空）</p>
-      </Reveal>
-
-      <div className="max-w-3xl mx-auto space-y-6">
-        <Reveal delayMs={0}>
-          <MenuItem
-            title="初回お試しコース"
-            time="約70分"
-            price="¥6,600"
-            description="カウンセリング・検査・施術を体験。ご自身の身体と向き合う第一歩に。"
-          />
-        </Reveal>
-        <Reveal delayMs={90}>
-          <MenuItem
-            title="通常メンテナンスコース"
-            time="約50分"
-            price="¥8,800"
-            description="定期的な体のメンテナンスに。その日の状態に合わせて丁寧に整えます。"
-          />
-        </Reveal>
-        <Reveal delayMs={180}>
-          <MenuItem
-            title="集中ケアコース"
-            time="約80分"
-            price="¥13,200"
-            description="特に気になる箇所がある方へ。全身のバランスを見ながらじっくりケアします。"
-          />
-        </Reveal>
-
-        <Reveal delayMs={260} className="pt-6">
-          <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur p-5 text-sm text-gray-300 leading-relaxed">
-            <p className="font-semibold text-white mb-2">補足（架空）</p>
-            <ul className="list-disc list-inside space-y-1 text-gray-400">
-              <li>施術内容は状態により調整します。</li>
-              <li>無理な勧誘や強引な回数提案は行いません。</li>
-              <li>医療行為ではなく、体のコンディショニングを目的とした内容です。</li>
-            </ul>
           </div>
-        </Reveal>
-      </div>
-    </div>
-  </section>
-);
+        </MotionSection>
 
-const GallerySection = () => (
-  <section className="py-20 md:py-28 bg-[#0B1220]">
-    <div className="container mx-auto px-4 sm:px-6">
-      <Reveal className="text-center mb-12">
-        <h2 className="text-3xl md:text-4xl font-serif font-medium">院内紹介</h2>
-        <p className="mt-4 text-gray-400">静かな時間を過ごせる空間づくり。（架空）</p>
-      </Reveal>
+        {/* ============================
+            セクション7: 患者様の声
+           ============================ */}
+        <MotionSection className="py-16 md:py-24 bg-[#FAF8F3]">
+          <div className="mx-auto max-w-5xl">
+            <div className="text-center mb-10">
+              <h2
+                className="text-2xl md:text-4xl font-extrabold text-[#2D6A4F]"
+                style={headingFont}
+              >
+                患者様の声
+              </h2>
+            </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Reveal delayMs={0}>
-          <GalleryCard img="/demo/clinic/room.png" alt="清潔感のある施術室（架空）" label="施術室" />
-        </Reveal>
-        <Reveal delayMs={70}>
-          <GalleryCard img="/demo/clinic/treatment.png" alt="施術スペース（架空）" label="施術スペース" />
-        </Reveal>
-        <Reveal delayMs={140}>
-          <GalleryCard img="/demo/clinic/staff.png" alt="カウンセリング風景（架空）" label="カウンセリング" />
-        </Reveal>
-        <Reveal delayMs={210}>
-          <GalleryCard img="/demo/clinic/gallery-1.png" alt="院内のインテリア（架空）" label="インテリア" />
-        </Reveal>
-        <Reveal delayMs={280} className="col-span-2 md:col-span-3">
-          <GalleryCard img="/demo/clinic/gallery-2.png" alt="受付エリア（架空）" label="受付" className="h-full" />
-        </Reveal>
-      </div>
-
-      <Reveal delayMs={340} className="mt-10 text-xs text-gray-500 text-center">
-        ※画像はデモ用（架空）です。実在の施設ではありません。
-      </Reveal>
-    </div>
-  </section>
-);
-
-const FaqSection = () => (
-  <section className="py-20 md:py-28">
-    <div className="container mx-auto px-4 sm:px-6">
-      <Reveal className="text-center mb-12">
-        <h2 className="text-3xl md:text-4xl font-serif font-medium">よくあるご質問</h2>
-      </Reveal>
-
-      <Reveal delayMs={80} className="max-w-3xl mx-auto space-y-4">
-        <FaqItem
-          question="着替えは必要ですか？"
-          answer="動きやすい服装であればそのままでも可能ですが、無料のお着替えもご用意している想定です。（架空）"
-        />
-        <FaqItem
-          question="施術は痛いですか？"
-          answer="強い刺激を前提とせず、心地よいと感じる強さを目安に進めます。力加減は都度確認します。（架空）"
-        />
-        <FaqItem
-          question="健康保険は使えますか？"
-          answer="当サロンは自費のみの想定です。保険適用については各制度をご確認ください。（架空）"
-        />
-        <FaqItem
-          question="どのくらいの頻度で通えば良いですか？"
-          answer="状態によって異なります。まずは短い間隔で様子を見て、安定してきたらメンテナンスへ移行する方が多い想定です。（架空）"
-        />
-        <FaqItem
-          question="予約なしでも行けますか？"
-          answer="完全予約制の想定です。事前にご予約のうえご来店ください。（架空）"
-        />
-      </Reveal>
-    </div>
-  </section>
-);
-
-const ContactSection = () => (
-  <section id="contact" className="py-20 md:py-28 bg-[#0B1220]">
-    <div className="container mx-auto px-4 sm:px-6 text-center">
-      <Reveal>
-        <h2 className="text-3xl md:text-4xl font-serif font-medium">ご予約・お問い合わせ</h2>
-        <p className="mt-4 max-w-xl mx-auto text-gray-400">
-          ご予約はWEB、LINE、お電話にて承ります。ご不明な点もお気軽にご連絡ください。（架空）
-        </p>
-      </Reveal>
-
-      <Reveal delayMs={120} className="mt-10">
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a
-            href="#"
-            className="w-full sm:w-auto px-8 py-4 rounded-md font-semibold bg-teal-500 text-white hover:bg-teal-600 transition-colors duration-300"
-          >
-            WEB予約へ進む
-          </a>
-          <a
-            href="#"
-            className="w-full sm:w-auto px-8 py-4 rounded-md font-semibold bg-emerald-600 text-white hover:bg-emerald-700 transition-colors duration-300"
-          >
-            LINEで予約
-          </a>
-          <a
-            href="tel:000-0000-0000"
-            className="w-full sm:w-auto px-8 py-4 rounded-md font-semibold border border-white/30 text-white hover:bg-white/10 transition-colors duration-300"
-          >
-            電話で問い合わせ
-          </a>
-        </div>
-      </Reveal>
-
-      <Reveal delayMs={220} className="mt-12 text-sm text-gray-500 max-w-2xl mx-auto text-left space-y-4">
-        <p>※施術中はお電話に出られない場合がある想定です。留守電にメッセージを残してください。（架空）</p>
-        <p>
-          ※キャンセルポリシー（架空）：ご予約の変更・キャンセルは前日まで。当日キャンセルは施術代金の100%を申し受ける場合があります。
-        </p>
-      </Reveal>
-    </div>
-  </section>
-);
-
-const AccessSection = () => (
-  <section className="py-20 text-center">
-    <div className="container mx-auto px-4 sm:px-6">
-      <Reveal>
-        <h2 className="text-3xl md:text-4xl font-serif font-medium mb-6">アクセス</h2>
-      </Reveal>
-
-      <Reveal delayMs={90} className="text-gray-300 space-y-1">
-        <p>静穏整体サロン（架空）</p>
-        <p>東京都目黒区（架空の住所です）</p>
-        <p>JR山手線・東急目黒線「目黒駅」より徒歩5分（架空）</p>
-        <p className="pt-4">営業時間：平日 10:00-20:00 / 土日 10:00-18:00（架空）</p>
-      </Reveal>
-
-      <Reveal delayMs={170} className="mt-8 max-w-3xl mx-auto">
-        <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur p-6 text-left">
-          <p className="text-sm text-gray-400 mb-2">地図（ダミー）</p>
-          <div className="aspect-[16/8] rounded-lg bg-[#061412] border border-white/10 grid place-items-center text-gray-500 text-sm">
-            MAP PLACEHOLDER
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {[
+                {
+                  n: 1,
+                  symptom: "腰痛",
+                  age: "40代",
+                  gender: "男性",
+                  text: "長年の腰の重だるさが気になり通い始めました。3回ほど通ったあたりから、朝の支度が楽になった気がします。先生の説明も丁寧で、自分の体への理解が深まりました。",
+                },
+                {
+                  n: 2,
+                  symptom: "肩こり",
+                  age: "30代",
+                  gender: "女性",
+                  text: "デスクワークで肩がバキバキだったのですが、セルフケアも教えてもらえるので、施術と合わせて少しずつ楽になっていくのを感じています。個室なのも嬉しいです。",
+                },
+                {
+                  n: 3,
+                  symptom: "頭痛",
+                  age: "50代",
+                  gender: "女性",
+                  text: "週に何度もあった頭痛が気になり、友人の紹介で伺いました。首や肩のバランスを整えてもらいながら、生活習慣のアドバイスもいただけて助かっています。",
+                },
+                {
+                  n: 4,
+                  symptom: "産後ケア",
+                  age: "30代",
+                  gender: "女性",
+                  text: "産後の骨盤が気になっていました。子連れ相談OKとのことで安心して通えています。施術後は体が軽くなった感覚があり、育児も少し前向きになれます。",
+                },
+                {
+                  n: 5,
+                  symptom: "姿勢改善",
+                  age: "60代",
+                  gender: "男性",
+                  text: "年齢とともに姿勢が悪くなり、背中のハリが気になっていました。丁寧に体の状態を説明してくれるので、納得感を持って通えています。無理な勧誘もなく好印象です。",
+                },
+              ].map((review) => (
+                <div
+                  key={review.n}
+                  className="rounded-2xl bg-white border border-[#2D6A4F]/15 p-6"
+                >
+                  {/* アバター + 属性 */}
+                  <div className="flex items-center gap-3 mb-4">
+                    <img
+                      src={`/demo/clinic/testimonial-${review.n}.png`}
+                      alt={`患者様の声${review.n}`}
+                      className="w-14 h-14 rounded-full object-cover border border-[#2D6A4F]/15"
+                      loading="lazy"
+                    />
+                    <div>
+                      <span className="inline-block text-xs bg-[#2D6A4F]/10 text-[#2D6A4F] px-2 py-0.5 rounded-full font-bold mb-1">
+                        {review.symptom}
+                      </span>
+                      <div className="text-xs text-[#2C3A2C]/60">
+                        {review.age} {review.gender}
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-sm text-[#2C3A2C] leading-relaxed">
+                    「{review.text}」
+                  </p>
+                  {/* 各レビューに個人差注記 */}
+                  <p className="mt-3 text-[10px] text-[#2C3A2C]/40">
+                    ※個人の感想であり、効果には個人差があります
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      </Reveal>
-    </div>
-  </section>
-);
+        </MotionSection>
 
-const Footer = () => (
-  <footer className="py-8 bg-[#061412] border-t border-white/10 text-center">
-    <p className="text-xs text-gray-500">
-      【注意】本サイトは架空の店舗・サービスを用いたデモ（ポートフォリオ）です。実在の人物・団体とは一切関係ありません。
-    </p>
-  </footer>
-);
+        {/* ============================
+            セクション8: 初回来院の流れ
+           ============================ */}
+        <MotionSection className="py-16 md:py-24 bg-white">
+          <div className="mx-auto max-w-5xl">
+            <h2
+              className="text-2xl md:text-4xl font-extrabold text-center text-[#2D6A4F]"
+              style={headingFont}
+            >
+              初回来院の流れ
+            </h2>
 
-// --- Reusable Components ---
-const ReasonCard = ({ title, description }: { title: string; description: string }) => (
-  <div className="bg-white/5 border border-white/10 rounded-lg p-6 text-center backdrop-blur">
-    <h3 className="font-bold text-lg text-white mb-3">{title}</h3>
-    <p className="text-gray-400 text-sm leading-relaxed">{description}</p>
-  </div>
-);
+            <div className="mt-10 grid gap-6 md:grid-cols-5">
+              {[
+                {
+                  num: "01",
+                  title: "ご予約",
+                  desc: "WEB・LINE・お電話からご予約ください。ご希望の日時をお伝えいただければ、折り返しご連絡いたします。",
+                },
+                {
+                  num: "02",
+                  title: "ご来院・問診票の記入",
+                  desc: "ご来院後、問診票にお体の状態やお悩みをご記入いただきます。お着替えもご用意しております。",
+                },
+                {
+                  num: "03",
+                  title: "カウンセリング・検査",
+                  desc: "問診票をもとに、姿勢チェックや可動域検査を行い、お体の状態を詳しく把握します。",
+                },
+                {
+                  num: "04",
+                  title: "施術",
+                  desc: "検査結果に基づき、お一人おひとりに最適な施術プランで丁寧にアプローチします。",
+                },
+                {
+                  num: "05",
+                  title: "アフターケア・次回のご提案",
+                  desc: "施術後のお体の変化を確認し、セルフケアのアドバイスと通院の目安をご説明します。",
+                },
+              ].map((step) => (
+                <div
+                  key={step.num}
+                  className="rounded-2xl bg-[#FAF8F3] border border-[#2D6A4F]/15 p-5 shadow-sm"
+                >
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-xs font-extrabold tracking-wider text-[#2D6A4F] bg-[#74C69D]/20 px-2 py-1 rounded">
+                      {step.num}
+                    </span>
+                    <div className="h-px flex-1 bg-[#2D6A4F]/10" />
+                  </div>
+                  <h3
+                    className="text-base font-bold text-[#2C3A2C]"
+                    style={headingFont}
+                  >
+                    {step.title}
+                  </h3>
+                  <p className="mt-2 text-xs text-[#2C3A2C]/70 leading-relaxed">
+                    {step.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
 
-const FlowStep = ({
-  number,
-  title,
-  description,
-  delayMs = 0,
-}: {
-  number: string;
-  title: string;
-  description: string;
-  delayMs?: number;
-}) => (
-  <Reveal delayMs={delayMs}>
-    <div className="relative pl-12 md:pl-0 md:flex md:items-start md:gap-8 mb-12 last:mb-0">
-      <div className="md:w-1/2 md:text-right md:pr-8">
-        <div className="absolute left-4 md:left-1/2 top-1 w-10 h-10 bg-teal-500/10 border border-teal-500/30 rounded-full flex items-center justify-center -translate-x-1/2">
-          <span className="text-teal-300 font-bold">{number}</span>
-        </div>
-      </div>
-      <div className="md:w-1/2 md:pl-8 pt-1 md:pt-0">
-        <h3 className="font-bold text-lg text-white mb-2">{title}</h3>
-        <p className="text-gray-400 leading-relaxed">{description}</p>
-      </div>
-    </div>
-  </Reveal>
-);
+            {/* 施術風景 */}
+            <div className="aspect-video mt-8 rounded-2xl overflow-hidden border border-[#2D6A4F]/15">
+              <img
+                src="/demo/clinic/treatment.png"
+                alt="施術風景（架空デモ）"
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </MotionSection>
 
-const MenuItem = ({
-  title,
-  time,
-  price,
-  description,
-}: {
-  title: string;
-  time: string;
-  price: string;
-  description: string;
-}) => (
-  <div className="border-b border-white/10 pb-6">
-    <div className="flex justify-between items-start gap-4">
-      <h3 className="font-bold text-lg text-white">{title}</h3>
-      <div className="text-right flex-shrink-0">
-        <p className="font-bold text-lg text-white">{price}</p>
-        <p className="text-sm text-gray-400">{time}</p>
-      </div>
-    </div>
-    <p className="mt-2 text-gray-400 text-sm">{description}</p>
-  </div>
-);
+        {/* ============================
+            セクション9: よくあるご質問（FAQ）
+            useStateによるアコーディオン
+           ============================ */}
+        <MotionSection className="py-16 md:py-24 bg-[#FAF8F3]">
+          <div className="mx-auto max-w-4xl">
+            <h2
+              className="text-2xl md:text-4xl font-extrabold text-center text-[#2D6A4F]"
+              style={headingFont}
+            >
+              よくあるご質問
+            </h2>
 
-const GalleryCard = ({
-  img,
-  alt,
-  label,
-  className = "",
-}: {
-  img: string;
-  alt: string;
-  label: string;
-  className?: string;
-}) => (
-  <div className={`relative aspect-video rounded-lg overflow-hidden bg-[#061412] group ${className}`}>
-    <img src={img} alt={alt} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-    <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
-    <div className="absolute inset-0 ring-1 ring-inset ring-white/10" />
-    <p className="absolute bottom-3 left-3 text-sm font-bold text-white drop-shadow">{label}</p>
-  </div>
-);
+            <div className="mt-10 space-y-3">
+              <FaqItem
+                q="どんな服装で行けばいいですか？"
+                a="動きやすい服装でお越しいただくのが理想ですが、お着替えもご用意しておりますので、お仕事帰りでもそのままお越しいただけます。"
+              />
+              <FaqItem
+                q="子連れでも大丈夫ですか？"
+                a="事前にご相談いただければ対応いたします。お子様の年齢や状況に応じて、ベストな対応を一緒に考えさせてください。"
+              />
+              <FaqItem
+                q="駐車場はありますか？"
+                a="専用駐車場はございませんが、近隣にコインパーキングが複数ございます。詳細はご予約時にご案内いたします。"
+              />
+              <FaqItem
+                q="保険は使えますか？"
+                a="当院は自費施術のみとなります。健康保険の適用はございませんが、その分お一人おひとりに十分な時間をかけて丁寧に施術いたします。"
+              />
+              <FaqItem
+                q="施術は痛いですか？"
+                a="強い刺激を加える施術は行いません。施術中も都度お声がけし、力加減を確認しながら進めますのでご安心ください。"
+              />
+              <FaqItem
+                q="予約なしでも受けられますか？"
+                a="当院は完全予約制です。LINE・お電話・WEBからご予約をお願いいたします。当日のご予約も空きがあれば対応可能です。"
+              />
+              <FaqItem
+                q="何回くらい通えばいいですか？"
+                a="お体の状態や症状によって異なります。まずは初回の施術でお体の状態を確認し、通院の目安を丁寧にご説明いたします。"
+              />
+              <FaqItem
+                q="キャンセルはできますか？"
+                a="前日までにご連絡いただければキャンセル・変更が可能です。当日キャンセルの場合はキャンセル料が発生する場合がございます。"
+              />
+            </div>
+          </div>
+        </MotionSection>
 
-const FaqItem = ({ question, answer }: { question: string; answer: string }) => (
-  <details className="border-b border-white/10 pb-4 group">
-    <summary className="font-bold text-white cursor-pointer flex justify-between items-center list-none py-2">
-      <span>{question}</span>
-      <svg
-        className="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform duration-300"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        aria-hidden="true"
+        {/* ============================
+            セクション10: 院内ギャラリー
+           ============================ */}
+        <MotionSection className="py-16 md:py-24 bg-white">
+          <div className="mx-auto max-w-5xl">
+            <h2
+              className="text-2xl md:text-4xl font-extrabold text-center text-[#2D6A4F] mb-10"
+              style={headingFont}
+            >
+              院内の様子
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[
+                { src: "/demo/clinic/gallery-1.png", alt: "院内の様子1（架空デモ）" },
+                { src: "/demo/clinic/gallery-2.png", alt: "院内の様子2（架空デモ）" },
+                { src: "/demo/clinic/gallery-3.png", alt: "院内の様子3（架空デモ）" },
+              ].map((img, i) => (
+                <div
+                  key={i}
+                  className="aspect-[4/3] rounded-2xl overflow-hidden border border-[#2D6A4F]/15 shadow-sm"
+                >
+                  <img
+                    src={img.src}
+                    alt={img.alt}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+              ))}
+            </div>
+
+            <p className="mt-4 text-center text-xs text-[#2C3A2C]/40">
+              ※画像は架空のデモです
+            </p>
+          </div>
+        </MotionSection>
+
+        {/* ============================
+            セクション11: アクセス・営業時間
+           ============================ */}
+        <MotionSection className="py-16 md:py-24 bg-white">
+          <div className="mx-auto max-w-4xl">
+            <h2
+              className="text-2xl md:text-4xl font-extrabold text-center text-[#2D6A4F]"
+              style={headingFont}
+            >
+              アクセス・営業時間
+            </h2>
+
+            <div className="mt-10 grid gap-8 md:grid-cols-2">
+              {/* 左カラム: 外観写真 + 地図プレースホルダー */}
+              <div className="space-y-4">
+                {/* 院内・個室 */}
+                <div className="aspect-video rounded-2xl overflow-hidden border border-[#2D6A4F]/15">
+                  <img
+                    src="/demo/clinic/room.png"
+                    alt="完全個室の施術空間（架空デモ）"
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+                {/* 地図プレースホルダー */}
+                <div className="rounded-2xl bg-gradient-to-br from-[#FAF8F3] to-[#2D6A4F]/5 border border-[#2D6A4F]/15 h-48 flex items-center justify-center">
+                  <div className="text-center text-[#2D6A4F]/30">
+                    <div className="text-3xl mb-2">📍</div>
+                    <span className="text-sm">Google Map（プレースホルダー）</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 右カラム: 情報テーブル */}
+              <div className="space-y-4">
+                <InfoRow label="院名" value="静穏整体サロン（架空）" />
+                <InfoRow
+                  label="住所"
+                  value="〒153-0000 東京都目黒区○○ 1-2-3（架空）"
+                />
+                <InfoRow label="最寄り駅" value="目黒駅 徒歩5分（架空）" />
+                <InfoRow
+                  label="診療時間"
+                  value={
+                    <>
+                      平日 10:00〜20:00
+                      <br />
+                      土日 10:00〜18:00
+                    </>
+                  }
+                />
+                <InfoRow label="定休日" value="水曜・祝日" />
+                <InfoRow
+                  label="駐車場"
+                  value="近隣コインパーキングあり"
+                />
+              </div>
+            </div>
+          </div>
+        </MotionSection>
+
+        {/* ============================
+            セクション11: 最終CTA
+           ============================ */}
+        <section id="final-cta" className="py-16 md:py-24 bg-[#2D6A4F] text-white">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="mx-auto max-w-3xl text-center">
+              <h2
+                className="text-2xl md:text-3xl font-extrabold whitespace-pre-line"
+                style={headingFont}
+              >
+                {"まずは一度、お体の状態を\n聞かせてください。"}
+              </h2>
+
+              {/* メインCTA */}
+              <div className="mt-8">
+                <a
+                  href="#"
+                  className="inline-flex items-center justify-center rounded-full bg-[#FFD166] text-[#2D6A4F] px-10 py-4 text-lg font-bold hover:brightness-95 transition shadow-lg"
+                >
+                  初回 ¥3,980で体験する
+                </a>
+              </div>
+
+              {/* サブボタン */}
+              <div className="mt-4 flex flex-col sm:flex-row gap-3 justify-center">
+                <a
+                  href="#"
+                  className="inline-flex items-center justify-center rounded-full bg-[#74C69D] text-white px-8 py-3 text-sm font-bold hover:brightness-95 transition"
+                >
+                  LINEで予約
+                </a>
+                <a
+                  href="#"
+                  className="inline-flex items-center justify-center rounded-full border border-white/40 text-white px-8 py-3 text-sm font-bold hover:bg-white/10 transition"
+                >
+                  電話で予約
+                </a>
+              </div>
+
+              {/* 安心テキスト */}
+              <p className="mt-6 text-sm text-white/80">
+                ※ 当日予約OK ／ 着替え無料 ／ 無理な勧誘なし
+              </p>
+              <p className="mt-2 text-xs text-white/50">
+                ※本ページは架空のデモです。予約ボタンは実際には機能しません。
+              </p>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      {/* ============================
+          フッター
+         ============================ */}
+      <footer className="py-10 text-center text-xs text-[#2C3A2C]/50 border-t border-[#2D6A4F]/10 bg-[#FAF8F3]">
+        <p className="font-bold text-sm text-[#2C3A2C]/70" style={headingFont}>
+          静穏整体サロン
+        </p>
+        <p className="mt-1 text-[#2C3A2C]/40 text-xs">
+          あなたの体と丁寧に向き合うプライベートサロン
+        </p>
+        <p className="mt-3">
+          【注意】本サイトは架空の整体院を想定したデモ（ポートフォリオ）です。
+          <br />
+          実在の店舗・人物・団体とは一切関係ありません。
+        </p>
+        <p className="mt-2">&copy; 2026</p>
+      </footer>
+
+      {/* ============================
+          フローティングCTA（右下固定・円形）
+         ============================ */}
+      <a
+        href="#final-cta"
+        className="fixed bottom-6 right-6 z-50 w-16 h-16 flex items-center justify-center rounded-full bg-[#FFD166] text-[#2D6A4F] text-sm font-bold shadow-xl hover:brightness-95 transition hover:scale-105"
+        aria-label="予約する"
       >
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-      </svg>
-    </summary>
-    <p className="mt-2 text-gray-300 leading-relaxed pr-6">{answer}</p>
-  </details>
-);
+        予約
+      </a>
+    </div>
+  );
+}
 
-export default Clinic;
+/* ============================
+   サブコンポーネント
+  ============================ */
 
-/*
---- 簡易チェックリスト ---
-[ ] /clinic 直URLで表示OK（wouterのRoute設定が前提）
-[ ] /clinic?concern=posture などで症状が初期反映される
-[ ] タブ押下で URL の ?concern= が更新される
-[ ] 画像が404でも崩れない（背景色・比率で担保）
-[ ] スクロールで要素が出現する（prefers-reduced-motion は即表示）
-[ ] 架空注記が入っている（Hero/フッター）
-*/
+/* セクションラッパー（framer-motionアニメーション付き） */
+function MotionSection({
+  children,
+  className = "",
+  id,
+}: {
+  children: ReactNode;
+  className?: string;
+  id?: string;
+}) {
+  return (
+    <motion.section
+      id={id}
+      className={`px-4 md:px-6 ${className}`}
+      initial={reveal.initial}
+      whileInView={reveal.whileInView}
+      transition={reveal.transition}
+      viewport={reveal.viewport}
+    >
+      {children}
+    </motion.section>
+  );
+}
+
+/* FAQアコーディオン（useState使用） */
+function FaqItem({ q, a }: { q: string; a: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="rounded-xl bg-white border border-[#2D6A4F]/15 overflow-hidden">
+      {/* アコーディオンヘッダー */}
+      <button
+        className="w-full text-left px-5 py-4 flex items-center justify-between font-bold text-[#2C3A2C] hover:bg-[#2D6A4F]/5 transition"
+        onClick={() => setOpen(!open)}
+        aria-expanded={open}
+      >
+        <span className="pr-4">{q}</span>
+        <span
+          className={`text-[#2D6A4F] text-xl transition-transform duration-200 flex-shrink-0 ${
+            open ? "rotate-45" : ""
+          }`}
+        >
+          ＋
+        </span>
+      </button>
+      {/* アコーディオンコンテンツ */}
+      <div
+        className={`overflow-hidden transition-all duration-300 ${
+          open ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
+        }`}
+      >
+        <p className="px-5 pb-4 text-sm text-[#2C3A2C]/70 leading-relaxed">{a}</p>
+      </div>
+    </div>
+  );
+}
+
+/* アクセス情報の行コンポーネント */
+function InfoRow({
+  label,
+  value,
+}: {
+  label: string;
+  value: ReactNode;
+}) {
+  return (
+    <div className="flex gap-4 border-b border-[#2D6A4F]/10 pb-3">
+      <div
+        className="text-sm font-bold text-[#2D6A4F] w-20 flex-shrink-0"
+        style={headingFont}
+      >
+        {label}
+      </div>
+      <div className="text-sm text-[#2C3A2C]/80 leading-relaxed">{value}</div>
+    </div>
+  );
+}
